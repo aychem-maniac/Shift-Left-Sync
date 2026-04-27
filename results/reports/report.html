@@ -106,9 +106,9 @@
 
     <div class="summary">
         <p><strong>Target:</strong> http://scanme.nmap.org</p>
-        <p><strong>Generated At:</strong> 2026-04-27 14:49:57</p>
+        <p><strong>Generated At:</strong> 2026-04-27 17:26:21</p>
         <p><strong>Open Port Results:</strong> 8</p>
-        <p><strong>Finding Results:</strong> 142</p>
+        <p><strong>Finding Results:</strong> 149</p>
 
         <div class="summary-grid">
             <div class="summary-card">
@@ -121,11 +121,11 @@
             </div>
             <div class="summary-card">
                 <strong>Medium</strong><br>
-                26
+                31
             </div>
             <div class="summary-card">
                 <strong>Low / Info</strong><br>
-                53 / 63
+                55 / 63
             </div>
         </div>
     </div>
@@ -149,10 +149,10 @@
                 <td>45.33.32.156</td>
                 <td>22</td>
                 <td>tcp</td>
-                <td>tcpwrapped</td>
+                <td>ssh</td>
                 <td>open</td>
-                <td></td>
-                <td></td>
+                <td>OpenSSH</td>
+                <td>6.6.1p1 Ubuntu 2ubuntu2.13</td>
             </tr>
             
             <tr>
@@ -474,6 +474,51 @@
                 <td>Medium</td>
                 <td>http://scanme.nmap.org/shared/js/</td>
                 <td>The site is only served under HTTP and not HTTPS.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Content Security Policy (CSP) Header Not Set</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/icons</td>
+                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
+            </tr>
+            
+            <tr>
+                <td>header_scan</td>
+                <td>Missing Security Header: Content-Security-Policy</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org</td>
+                <td>Content-Security-Policy header is not set.</td>
+            </tr>
+            
+            <tr>
+                <td>header_scan</td>
+                <td>Missing Security Header: X-Frame-Options</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org</td>
+                <td>X-Frame-Options header is not set.</td>
+            </tr>
+            
+            <tr>
+                <td>header_scan</td>
+                <td>Missing Security Header: Strict-Transport-Security</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org</td>
+                <td>Strict-Transport-Security header is not set.</td>
+            </tr>
+            
+            <tr>
+                <td>header_scan</td>
+                <td>Missing Security Header: X-Content-Type-Options</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org</td>
+                <td>X-Content-Type-Options header is not set.</td>
             </tr>
             
             <tr>
@@ -951,6 +996,24 @@
                 <td>Medium</td>
                 <td>http://scanme.nmap.org/images/</td>
                 <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>In Page Banner Information Leak</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/icons</td>
+                <td>The server returned a version banner string in the response content. Such information leaks may allow attackers to further target specific issues impacting the product and version in use.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/icons</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
             </tr>
             
             <tr>

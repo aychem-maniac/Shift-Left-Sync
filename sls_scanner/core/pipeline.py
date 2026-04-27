@@ -3,6 +3,9 @@
 # 대상 URL/IP 검증 함수를 가져온다.
 from sls_scanner.core.target import validate_target
 
+# A05 연결
+from sls_scanner.scanners.header_scanner import run_header_scan
+
 # 공통 예외 클래스를 가져온다.
 from sls_scanner.core.exceptions import InvalidTargetError
 
@@ -46,6 +49,8 @@ def run_pipeline(target: str) -> None:
     # 3. SQLMap 스캔을 실행한다.
     # SQL Injection 가능성을 자동 점검한다.
     raw_sqlmap_result = run_sqlmap_scan(target)
+    # A05 검사
+    raw_header_result = run_header_scan(target)
 
     # 4. Nmap 원시 결과를 프로젝트 표준 포트 결과 형식으로 변환한다.
     port_results = normalize_nmap_result(raw_nmap_result)
@@ -59,6 +64,19 @@ def run_pipeline(target: str) -> None:
     # 7. ZAP 결과와 SQLMap 결과를 하나의 취약점 목록으로 합친다.
     findings = zap_findings + sqlmap_findings
 
+    header_findings = []
+
+    for h in raw_header_result["missing_headers"]:
+        header_findings.append({
+            "source": "header_scan",
+            "name": f"Missing Security Header: {h}",
+            "severity": "Medium",
+            "confidence": "High",
+            "url": target,
+            "description": f"{h} header is not set."
+        })
+
+    findings = findings + header_findings
     # 8. 취약점 위험도를 평가한다.
     # severity 기준으로 risk_score와 is_critical 값을 추가한다.
     evaluated_findings = evaluate_risk(findings)
