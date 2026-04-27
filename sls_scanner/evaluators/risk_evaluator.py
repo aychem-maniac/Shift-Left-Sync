@@ -1,9 +1,42 @@
 # sls_scanner/evaluators/risk_evaluator.py
 
-
 def evaluate_risk(findings: list[dict]) -> list[dict]:
-    # 나중에 취약점 위험도를 평가하는 코드가 들어갈 자리다.
-    print("[INFO] Risk evaluation placeholder")
+    print("[INFO] Risk evaluation started")
 
-    # 지금은 입력받은 findings를 그대로 반환한다.
-    return findings
+    severity_score_map = {
+        "Critical": 5,
+        "High": 4,
+        "Medium": 3,
+        "Low": 2,
+        "Info": 1,
+        "Informational": 1,
+        "Unknown": 0
+    }
+
+    evaluated_findings = []
+
+    for finding in findings:
+        severity = finding.get("severity", "Unknown")
+
+        if severity == "Informational":
+            severity = "Info"
+
+        risk_score = severity_score_map.get(severity, 0)
+
+        evaluated_finding = {
+            **finding,
+            "severity": severity,
+            "risk_score": risk_score,
+            "is_critical": risk_score >= 4
+        }
+
+        evaluated_findings.append(evaluated_finding)
+
+    evaluated_findings.sort(
+        key=lambda item: item.get("risk_score", 0),
+        reverse=True
+    )
+
+    print(f"[INFO] Risk evaluation completed: {len(evaluated_findings)} finding(s)")
+
+    return evaluated_findings
