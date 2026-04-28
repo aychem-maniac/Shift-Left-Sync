@@ -1,4 +1,5 @@
 # sls_scanner/normalizers/zap_normalizer.py
+from sls_scanner.normalizers.owasp_normalizer import enrich_findings
 
 def normalize_zap_result(raw_zap_result: dict) -> list[dict]:
     """
@@ -16,7 +17,7 @@ def normalize_zap_result(raw_zap_result: dict) -> list[dict]:
             findings.append({
                 "id": f"ZAP-{idx:03d}",
                 "source": "zap",
-                "name": alert.get("name", ""),
+                "name": alert.get("name", "") or alert.get("alert", ""),
                 "severity": alert.get("risk", "Unknown"),
                 "confidence": alert.get("confidence", "Unknown"),
                 "url": alert.get("url", ""),
@@ -24,6 +25,8 @@ def normalize_zap_result(raw_zap_result: dict) -> list[dict]:
                 "solution": alert.get("solution", ""),
                 "reference": alert.get("reference", "")
             })
+
+        findings = enrich_findings(findings)
 
         print(f"[INFO] ZAP normalization completed: {len(findings)} finding(s) found")
 

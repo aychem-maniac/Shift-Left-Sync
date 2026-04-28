@@ -67,12 +67,16 @@ def generate_html_report(
                 <td>{finding.get("confidence", "")}</td>
                 <td>{finding.get("url", "")}</td>
                 <td>{finding.get("description", "")}</td>
+                <td>{finding.get("owasp_category", "Unmapped")}</td>
+                <td>{finding.get("verification_status", "Need Manual Review")}</td>
+                <td>{finding.get("verification_method", "Need Manual Review")}</td>
+                <td>{finding.get("verification_note", "")}</td>
             </tr>
             """
     else:
         finding_rows = """
         <tr>
-            <td colspan="6">취약점 결과가 없습니다.</td>
+            <td colspan="10">취약점 결과가 없습니다.</td>
         </tr>
         """
 
@@ -236,6 +240,10 @@ def generate_html_report(
                 <th>Confidence</th>
                 <th>URL</th>
                 <th>Description</th>
+                <th>OWASP Top 10</th>
+                <th>Verification Status</th>
+                <th>Verification Method</th>
+                <th>Verification Note</th>
             </tr>
         </thead>
         <tbody>

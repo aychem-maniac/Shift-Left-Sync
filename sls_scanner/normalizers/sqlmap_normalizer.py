@@ -1,4 +1,5 @@
 # sls_scanner/normalizers/sqlmap_normalizer.py
+from sls_scanner.normalizers.owasp_normalizer import enrich_findings
 
 def normalize_sqlmap_result(raw_sqlmap_result: dict) -> list[dict]:
     """
@@ -41,6 +42,7 @@ def normalize_sqlmap_result(raw_sqlmap_result: dict) -> list[dict]:
                 "solution": "No immediate SQL Injection issue was detected. Consider deeper testing if needed.",
                 "reference": "https://sqlmap.org/"
             })
+        findings = enrich_findings(findings)
 
         print(f"[INFO] SQLMap normalization completed: {len(findings)} finding(s)")
         return findings

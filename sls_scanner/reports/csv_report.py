@@ -26,13 +26,16 @@ def generate_csv_report(findings: list[dict], port_results: list[dict]) -> str:
         if port_results:
             for port in port_results:
                 writer.writerow([
-                    port.get("host", ""),
-                    port.get("port", ""),
-                    port.get("protocol", ""),
-                    port.get("service", ""),
-                    port.get("state", ""),
-                    port.get("product", ""),
-                    port.get("version", "")
+                    "source",
+                    "name",
+                    "severity",
+                    "confidence",
+                    "url",
+                    "description",
+                    "owasp_category",
+                    "verification_status",
+                    "verification_method",
+                    "verification_note"
                 ])
         else:
             writer.writerow(["No port results"])
@@ -51,7 +54,11 @@ def generate_csv_report(findings: list[dict], port_results: list[dict]) -> str:
                     finding.get("severity", ""),
                     finding.get("confidence", ""),
                     finding.get("url", ""),
-                    finding.get("description", "")
+                    finding.get("description", ""),
+                    finding.get("owasp_category", "Unmapped"),
+                    finding.get("verification_status", "Need Manual Review"),
+                    finding.get("verification_method", "Need Manual Review"),
+                    finding.get("verification_note", "")
                 ])
         else:
             writer.writerow(["No findings"])

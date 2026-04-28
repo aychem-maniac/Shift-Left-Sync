@@ -1,5 +1,5 @@
 # sls_scanner/core/pipeline.py
-
+from sls_scanner.normalizers.header_normalizer import normalize_header_result
 # 대상 URL/IP 검증 함수를 가져온다.
 from sls_scanner.core.target import validate_target
 
@@ -64,19 +64,9 @@ def run_pipeline(target: str) -> None:
     # 7. ZAP 결과와 SQLMap 결과를 하나의 취약점 목록으로 합친다.
     findings = zap_findings + sqlmap_findings
 
-    header_findings = []
+    header_findings = normalize_header_result(raw_header_result)
 
-    for h in raw_header_result["missing_headers"]:
-        header_findings.append({
-            "source": "header_scan",
-            "name": f"Missing Security Header: {h}",
-            "severity": "Medium",
-            "confidence": "High",
-            "url": target,
-            "description": f"{h} header is not set."
-        })
-
-    findings = findings + header_findings
+    findings = zap_findings + sqlmap_findings + header_findings
     # 8. 취약점 위험도를 평가한다.
     # severity 기준으로 risk_score와 is_critical 값을 추가한다.
     evaluated_findings = evaluate_risk(findings)
