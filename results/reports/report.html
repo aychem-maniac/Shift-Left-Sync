@@ -106,9 +106,9 @@
 
     <div class="summary">
         <p><strong>Target:</strong> http://scanme.nmap.org</p>
-        <p><strong>Generated At:</strong> 2026-04-28 10:34:29</p>
+        <p><strong>Generated At:</strong> 2026-04-28 11:22:16</p>
         <p><strong>Open Port Results:</strong> 8</p>
-        <p><strong>Finding Results:</strong> 147</p>
+        <p><strong>Finding Results:</strong> 150</p>
 
         <div class="summary-grid">
             <div class="summary-card">
@@ -121,11 +121,11 @@
             </div>
             <div class="summary-card">
                 <strong>Medium</strong><br>
-                31
+                32
             </div>
             <div class="summary-card">
                 <strong>Low / Info</strong><br>
-                53 / 63
+                55 / 63
             </div>
         </div>
     </div>
@@ -274,6 +274,32 @@
             
             <tr>
                 <td>zap</td>
+                <td>Modern Web Application</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/</td>
+                <td>The application appears to be a modern web application. If you need to explore it automatically then the Ajax Spider may well be more effective than the standard one.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
                 <td>Sub Resource Integrity Attribute Missing</td>
                 <td class="severity-medium">Medium</td>
                 <td>High</td>
@@ -281,6 +307,19 @@
                 <td>The integrity attribute is missing on a script or link tag served by an external server. The integrity tag prevents an attacker who have gained access to this server from injecting a malicious content.</td>
                 <td>A08:2021-Software and Data Integrity Failures</td>
                 <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>X-Content-Type-Options Header Missing</td>
+                <td class="severity-low">Low</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/</td>
+                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Need Manual Review</td>
                 <td>Tool Cross-Validation</td>
                 <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
             </tr>
@@ -339,6 +378,136 @@
             
             <tr>
                 <td>zap</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/shared/images/tiny-eyeicon.png</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>In Page Banner Information Leak</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/sitemap.xml</td>
+                <td>The server returned a version banner string in the response content. Such information leaks may allow attackers to further target specific issues impacting the product and version in use.</td>
+                <td>A02:2021-Cryptographic Failures</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/images/sitelogo.png</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>In Page Banner Information Leak</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/robots.txt</td>
+                <td>The server returned a version banner string in the response content. Such information leaks may allow attackers to further target specific issues impacting the product and version in use.</td>
+                <td>A02:2021-Cryptographic Failures</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/shared/css/nst-foot.css?v=2</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/site.css</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/shared/css/nst.css?v=2</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/shared/images/nst-icons.svg</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>X-Content-Type-Options Header Missing</td>
+                <td class="severity-low">Low</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/images/tiny-eyeicon.png</td>
+                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Need Manual Review</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>In Page Banner Information Leak</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/images/sitelogo-2x.png</td>
+                <td>The server returned a version banner string in the response content. Such information leaks may allow attackers to further target specific issues impacting the product and version in use.</td>
+                <td>A02:2021-Cryptographic Failures</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
                 <td>Content Security Policy (CSP) Header Not Set</td>
                 <td class="severity-medium">Medium</td>
                 <td>High</td>
@@ -352,11 +521,102 @@
             
             <tr>
                 <td>zap</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/robots.txt</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>X-Content-Type-Options Header Missing</td>
+                <td class="severity-low">Low</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/css/nst-foot.css?v=2</td>
+                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Need Manual Review</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>X-Content-Type-Options Header Missing</td>
+                <td class="severity-low">Low</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/site.css</td>
+                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Need Manual Review</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
                 <td>Content Security Policy (CSP) Header Not Set</td>
                 <td class="severity-medium">Medium</td>
                 <td>High</td>
                 <td>http://scanme.nmap.org/search/?q</td>
                 <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>X-Content-Type-Options Header Missing</td>
+                <td class="severity-low">Low</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/images/nst-icons.svg</td>
+                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Need Manual Review</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>X-Content-Type-Options Header Missing</td>
+                <td class="severity-low">Low</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images/sitelogo.png</td>
+                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Need Manual Review</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/sitemap.xml</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/images/sitelogo-2x.png</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
                 <td>A05:2021-Security Misconfiguration</td>
                 <td>Likely True Positive</td>
                 <td>Tool Cross-Validation</td>
@@ -378,6 +638,97 @@
             
             <tr>
                 <td>zap</td>
+                <td>In Page Banner Information Leak</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/search/?q</td>
+                <td>The server returned a version banner string in the response content. Such information leaks may allow attackers to further target specific issues impacting the product and version in use.</td>
+                <td>A02:2021-Cryptographic Failures</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>X-Content-Type-Options Header Missing</td>
+                <td class="severity-low">Low</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/css/nst.css?v=2</td>
+                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Need Manual Review</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>In Page Banner Information Leak</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/search/</td>
+                <td>The server returned a version banner string in the response content. Such information leaks may allow attackers to further target specific issues impacting the product and version in use.</td>
+                <td>A02:2021-Cryptographic Failures</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Modern Web Application</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org</td>
+                <td>The application appears to be a modern web application. If you need to explore it automatically then the Ajax Spider may well be more effective than the standard one.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/search/?q</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/search/</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
                 <td>Sub Resource Integrity Attribute Missing</td>
                 <td class="severity-medium">Medium</td>
                 <td>High</td>
@@ -385,6 +736,45 @@
                 <td>The integrity attribute is missing on a script or link tag served by an external server. The integrity tag prevents an attacker who have gained access to this server from injecting a malicious content.</td>
                 <td>A08:2021-Software and Data Integrity Failures</td>
                 <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>X-Content-Type-Options Header Missing</td>
+                <td class="severity-low">Low</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org</td>
+                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Need Manual Review</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/shared/js/nst.js?v=2</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>X-Content-Type-Options Header Missing</td>
+                <td class="severity-low">Low</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/js/nst.js?v=2</td>
+                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Need Manual Review</td>
                 <td>Tool Cross-Validation</td>
                 <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
             </tr>
@@ -417,596 +807,791 @@
             
             <tr>
                 <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/css</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/js</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/css</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/js</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/css</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/js</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/css</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/js</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/css</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/js</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/css</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/js</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/css</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/js</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/css</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/js</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/css</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/js</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/css</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/js</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/css</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/js</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/css</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/images</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>User Agent 퍼저</td>
+                <td class="severity-informational">Informational</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/shared/js</td>
+                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
+                <td>Unmapped</td>
+                <td>Informational</td>
+                <td>Informational</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
                 <td>Missing Anti-clickjacking Header</td>
                 <td class="severity-medium">Medium</td>
                 <td>Medium</td>
                 <td>http://scanme.nmap.org/images/</td>
                 <td>The response does not protect against 'ClickJacking' attacks. It should include either Content-Security-Policy with 'frame-ancestors' directive or X-Frame-Options.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Need Manual Review</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Application Error Disclosure</td>
-                <td class="severity-medium">Medium</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images/</td>
-                <td>This page contains an error/warning message that may disclose sensitive information like the location of the file that produced the unhandled exception. This information can be used to launch further attacks against the web application. The alert could be a false positive if the error message is found inside a documentation page.</td>
-                <td>Unmapped</td>
-                <td>Need Manual Review</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Content Security Policy (CSP) Header Not Set</td>
-                <td class="severity-medium">Medium</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/images/</td>
-                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>디렉터리 탐색</td>
-                <td class="severity-medium">Medium</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images/</td>
-                <td>It is possible to view a listing of the directory contents. Directory listings may reveal hidden scripts, include files, backup source files, etc., which can be accessed to reveal sensitive information.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Need Manual Review</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Content Security Policy (CSP) Header Not Set</td>
-                <td class="severity-medium">Medium</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/search</td>
-                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Content Security Policy (CSP) Header Not Set</td>
-                <td class="severity-medium">Medium</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/shared/</td>
-                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Missing Anti-clickjacking Header</td>
-                <td class="severity-medium">Medium</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images/?C=S;O=A</td>
-                <td>The response does not protect against 'ClickJacking' attacks. It should include either Content-Security-Policy with 'frame-ancestors' directive or X-Frame-Options.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Need Manual Review</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Application Error Disclosure</td>
-                <td class="severity-medium">Medium</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images/?C=S;O=A</td>
-                <td>This page contains an error/warning message that may disclose sensitive information like the location of the file that produced the unhandled exception. This information can be used to launch further attacks against the web application. The alert could be a false positive if the error message is found inside a documentation page.</td>
-                <td>Unmapped</td>
-                <td>Need Manual Review</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Content Security Policy (CSP) Header Not Set</td>
-                <td class="severity-medium">Medium</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/shared/js/</td>
-                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Content Security Policy (CSP) Header Not Set</td>
-                <td class="severity-medium">Medium</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/images/?C=S;O=A</td>
-                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>디렉터리 탐색</td>
-                <td class="severity-medium">Medium</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images/?C=S;O=A</td>
-                <td>It is possible to view a listing of the directory contents. Directory listings may reveal hidden scripts, include files, backup source files, etc., which can be accessed to reveal sensitive information.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Need Manual Review</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Content Security Policy (CSP) Header Not Set</td>
-                <td class="severity-medium">Medium</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/shared/images/</td>
-                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Content Security Policy (CSP) Header Not Set</td>
-                <td class="severity-medium">Medium</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/shared/css/</td>
-                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>HTTP Only Site</td>
-                <td class="severity-medium">Medium</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/js/</td>
-                <td>The site is only served under HTTP and not HTTPS.</td>
-                <td>A02:2021-Cryptographic Failures</td>
-                <td>Need Manual Review</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>header_scan</td>
-                <td>Missing Security Header: Content-Security-Policy</td>
-                <td class="severity-medium">Medium</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org</td>
-                <td>Content-Security-Policy header is not set.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>응답 헤더를 재요청하여 해당 보안 헤더가 실제로 누락되었는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>header_scan</td>
-                <td>Missing Security Header: X-Frame-Options</td>
-                <td class="severity-medium">Medium</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org</td>
-                <td>X-Frame-Options header is not set.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>응답 헤더를 재요청하여 해당 보안 헤더가 실제로 누락되었는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>header_scan</td>
-                <td>Missing Security Header: Strict-Transport-Security</td>
-                <td class="severity-medium">Medium</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org</td>
-                <td>Strict-Transport-Security header is not set.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>응답 헤더를 재요청하여 해당 보안 헤더가 실제로 누락되었는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>header_scan</td>
-                <td>Missing Security Header: X-Content-Type-Options</td>
-                <td class="severity-medium">Medium</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org</td>
-                <td>X-Content-Type-Options header is not set.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>응답 헤더를 재요청하여 해당 보안 헤더가 실제로 누락되었는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/</td>
-                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>X-Content-Type-Options Header Missing</td>
-                <td class="severity-low">Low</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/</td>
-                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Need Manual Review</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/shared/images/tiny-eyeicon.png</td>
-                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>In Page Banner Information Leak</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/sitemap.xml</td>
-                <td>The server returned a version banner string in the response content. Such information leaks may allow attackers to further target specific issues impacting the product and version in use.</td>
-                <td>A02:2021-Cryptographic Failures</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/images/sitelogo.png</td>
-                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>In Page Banner Information Leak</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/robots.txt</td>
-                <td>The server returned a version banner string in the response content. Such information leaks may allow attackers to further target specific issues impacting the product and version in use.</td>
-                <td>A02:2021-Cryptographic Failures</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/shared/css/nst-foot.css?v=2</td>
-                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/site.css</td>
-                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/shared/css/nst.css?v=2</td>
-                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/shared/images/nst-icons.svg</td>
-                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>X-Content-Type-Options Header Missing</td>
-                <td class="severity-low">Low</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/images/tiny-eyeicon.png</td>
-                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Need Manual Review</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>In Page Banner Information Leak</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/images/sitelogo-2x.png</td>
-                <td>The server returned a version banner string in the response content. Such information leaks may allow attackers to further target specific issues impacting the product and version in use.</td>
-                <td>A02:2021-Cryptographic Failures</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/robots.txt</td>
-                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>X-Content-Type-Options Header Missing</td>
-                <td class="severity-low">Low</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/css/nst-foot.css?v=2</td>
-                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Need Manual Review</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>X-Content-Type-Options Header Missing</td>
-                <td class="severity-low">Low</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/site.css</td>
-                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Need Manual Review</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>X-Content-Type-Options Header Missing</td>
-                <td class="severity-low">Low</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/images/nst-icons.svg</td>
-                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Need Manual Review</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>X-Content-Type-Options Header Missing</td>
-                <td class="severity-low">Low</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images/sitelogo.png</td>
-                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Need Manual Review</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/sitemap.xml</td>
-                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/images/sitelogo-2x.png</td>
-                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>In Page Banner Information Leak</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/search/?q</td>
-                <td>The server returned a version banner string in the response content. Such information leaks may allow attackers to further target specific issues impacting the product and version in use.</td>
-                <td>A02:2021-Cryptographic Failures</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>X-Content-Type-Options Header Missing</td>
-                <td class="severity-low">Low</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/css/nst.css?v=2</td>
-                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Need Manual Review</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>In Page Banner Information Leak</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/search/</td>
-                <td>The server returned a version banner string in the response content. Such information leaks may allow attackers to further target specific issues impacting the product and version in use.</td>
-                <td>A02:2021-Cryptographic Failures</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/search/?q</td>
-                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org</td>
-                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/search/</td>
-                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>X-Content-Type-Options Header Missing</td>
-                <td class="severity-low">Low</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org</td>
-                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Need Manual Review</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
-                <td class="severity-low">Low</td>
-                <td>High</td>
-                <td>http://scanme.nmap.org/shared/js/nst.js?v=2</td>
-                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
-                <td>A05:2021-Security Misconfiguration</td>
-                <td>Likely True Positive</td>
-                <td>Tool Cross-Validation</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>X-Content-Type-Options Header Missing</td>
-                <td class="severity-low">Low</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/js/nst.js?v=2</td>
-                <td>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</td>
                 <td>A05:2021-Security Misconfiguration</td>
                 <td>Need Manual Review</td>
                 <td>Tool Cross-Validation</td>
@@ -1054,11 +1639,63 @@
             
             <tr>
                 <td>zap</td>
+                <td>Application Error Disclosure</td>
+                <td class="severity-medium">Medium</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images/</td>
+                <td>This page contains an error/warning message that may disclose sensitive information like the location of the file that produced the unhandled exception. This information can be used to launch further attacks against the web application. The alert could be a false positive if the error message is found inside a documentation page.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Need Manual Review</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
                 <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
                 <td class="severity-low">Low</td>
                 <td>High</td>
                 <td>http://scanme.nmap.org/shared</td>
                 <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Content Security Policy (CSP) Header Not Set</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/images/</td>
+                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>디렉터리 탐색</td>
+                <td class="severity-medium">Medium</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images/</td>
+                <td>It is possible to view a listing of the directory contents. Directory listings may reveal hidden scripts, include files, backup source files, etc., which can be accessed to reveal sensitive information.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Need Manual Review</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Content Security Policy (CSP) Header Not Set</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/search</td>
+                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
                 <td>A05:2021-Security Misconfiguration</td>
                 <td>Likely True Positive</td>
                 <td>Tool Cross-Validation</td>
@@ -1074,6 +1711,32 @@
                 <td>The server returned a version banner string in the response content. Such information leaks may allow attackers to further target specific issues impacting the product and version in use.</td>
                 <td>A02:2021-Cryptographic Failures</td>
                 <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Content Security Policy (CSP) Header Not Set</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/shared/</td>
+                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Missing Anti-clickjacking Header</td>
+                <td class="severity-medium">Medium</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images/?C=S;O=A</td>
+                <td>The response does not protect against 'ClickJacking' attacks. It should include either Content-Security-Policy with 'frame-ancestors' directive or X-Frame-Options.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Need Manual Review</td>
                 <td>Tool Cross-Validation</td>
                 <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
             </tr>
@@ -1145,6 +1808,45 @@
             
             <tr>
                 <td>zap</td>
+                <td>Application Error Disclosure</td>
+                <td class="severity-medium">Medium</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images/?C=S;O=A</td>
+                <td>This page contains an error/warning message that may disclose sensitive information like the location of the file that produced the unhandled exception. This information can be used to launch further attacks against the web application. The alert could be a false positive if the error message is found inside a documentation page.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Need Manual Review</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Content Security Policy (CSP) Header Not Set</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/shared/js/</td>
+                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Content Security Policy (CSP) Header Not Set</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/images/?C=S;O=A</td>
+                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
                 <td>In Page Banner Information Leak</td>
                 <td class="severity-low">Low</td>
                 <td>High</td>
@@ -1152,6 +1854,19 @@
                 <td>The server returned a version banner string in the response content. Such information leaks may allow attackers to further target specific issues impacting the product and version in use.</td>
                 <td>A02:2021-Cryptographic Failures</td>
                 <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>디렉터리 탐색</td>
+                <td class="severity-medium">Medium</td>
+                <td>Medium</td>
+                <td>http://scanme.nmap.org/images/?C=S;O=A</td>
+                <td>It is possible to view a listing of the directory contents. Directory listings may reveal hidden scripts, include files, backup source files, etc., which can be accessed to reveal sensitive information.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Need Manual Review</td>
                 <td>Tool Cross-Validation</td>
                 <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
             </tr>
@@ -1176,6 +1891,19 @@
                 <td>High</td>
                 <td>http://scanme.nmap.org/shared/</td>
                 <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Content Security Policy (CSP) Header Not Set</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/shared/images/</td>
+                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
                 <td>A05:2021-Security Misconfiguration</td>
                 <td>Likely True Positive</td>
                 <td>Tool Cross-Validation</td>
@@ -1216,6 +1944,19 @@
                 <td>http://scanme.nmap.org/shared/images/</td>
                 <td>The server returned a version banner string in the response content. Such information leaks may allow attackers to further target specific issues impacting the product and version in use.</td>
                 <td>A02:2021-Cryptographic Failures</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>zap</td>
+                <td>Content Security Policy (CSP) Header Not Set</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/shared/css/</td>
+                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
+                <td>A05:2021-Security Misconfiguration</td>
                 <td>Likely True Positive</td>
                 <td>Tool Cross-Validation</td>
                 <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
@@ -1340,807 +2081,53 @@
             
             <tr>
                 <td>zap</td>
-                <td>Modern Web Application</td>
-                <td class="severity-info">Info</td>
+                <td>HTTP Only Site</td>
+                <td class="severity-medium">Medium</td>
                 <td>Medium</td>
-                <td>http://scanme.nmap.org/</td>
-                <td>The application appears to be a modern web application. If you need to explore it automatically then the Ajax Spider may well be more effective than the standard one.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
+                <td>http://scanme.nmap.org/shared/js/</td>
+                <td>The site is only served under HTTP and not HTTPS.</td>
+                <td>A02:2021-Cryptographic Failures</td>
+                <td>Need Manual Review</td>
+                <td>Tool Cross-Validation</td>
                 <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
             </tr>
             
             <tr>
                 <td>zap</td>
-                <td>Modern Web Application</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org</td>
-                <td>The application appears to be a modern web application. If you need to explore it automatically then the Ajax Spider may well be more effective than the standard one.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
+                <td>Content Security Policy (CSP) Header Not Set</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/icons</td>
+                <td>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
                 <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
             </tr>
             
             <tr>
                 <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
+                <td>In Page Banner Information Leak</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/icons</td>
+                <td>The server returned a version banner string in the response content. Such information leaks may allow attackers to further target specific issues impacting the product and version in use.</td>
+                <td>A02:2021-Cryptographic Failures</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
                 <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
             </tr>
             
             <tr>
                 <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/css</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/js</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/css</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/js</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/css</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/js</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/css</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/js</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/css</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/js</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/css</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/js</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/css</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/js</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/css</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/js</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/css</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/js</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/css</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/js</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/css</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/js</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/css</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/images</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
-                <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
-            </tr>
-            
-            <tr>
-                <td>zap</td>
-                <td>User Agent 퍼저</td>
-                <td class="severity-info">Info</td>
-                <td>Medium</td>
-                <td>http://scanme.nmap.org/shared/js</td>
-                <td>퍼징된 User Agent(예: 모바일 사이트, 검색 엔진 크롤러로 접근)를 기반으로 응답의 차이점을 확인하십시오. 응답 상태 코드와 응답 본문의 해시 코드를 원본 응답과 비교합니다.</td>
-                <td>Unmapped</td>
-                <td>Informational</td>
-                <td>Informational</td>
+                <td>Server Leaks Version Information via "Server" HTTP Response Header Field</td>
+                <td class="severity-low">Low</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org/icons</td>
+                <td>The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
                 <td>ZAP 결과와 Header Scan/SQLMap/Nmap 결과를 비교하여 동일 취약점 유형이 반복 탐지되는지 확인한다.</td>
             </tr>
             
@@ -2155,6 +2142,58 @@
                 <td>Informational</td>
                 <td>Informational</td>
                 <td>현재 옵션에서는 SQL Injection이 탐지되지 않았다. 필요 시 level/risk를 높여 재검증한다.</td>
+            </tr>
+            
+            <tr>
+                <td>header_scan</td>
+                <td>Missing Security Header: Content-Security-Policy</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org</td>
+                <td>Content-Security-Policy header is not set.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>응답 헤더를 재요청하여 해당 보안 헤더가 실제로 누락되었는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>header_scan</td>
+                <td>Missing Security Header: X-Frame-Options</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org</td>
+                <td>X-Frame-Options header is not set.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>응답 헤더를 재요청하여 해당 보안 헤더가 실제로 누락되었는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>header_scan</td>
+                <td>Missing Security Header: Strict-Transport-Security</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org</td>
+                <td>Strict-Transport-Security header is not set.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>응답 헤더를 재요청하여 해당 보안 헤더가 실제로 누락되었는지 확인한다.</td>
+            </tr>
+            
+            <tr>
+                <td>header_scan</td>
+                <td>Missing Security Header: X-Content-Type-Options</td>
+                <td class="severity-medium">Medium</td>
+                <td>High</td>
+                <td>http://scanme.nmap.org</td>
+                <td>X-Content-Type-Options header is not set.</td>
+                <td>A05:2021-Security Misconfiguration</td>
+                <td>Likely True Positive</td>
+                <td>Tool Cross-Validation</td>
+                <td>응답 헤더를 재요청하여 해당 보안 헤더가 실제로 누락되었는지 확인한다.</td>
             </tr>
             
         </tbody>

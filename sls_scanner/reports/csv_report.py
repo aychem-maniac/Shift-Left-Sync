@@ -21,21 +21,32 @@ def generate_csv_report(findings: list[dict], port_results: list[dict]) -> str:
 
         # 🔹 포트 결과 먼저 저장
         writer.writerow(["=== Nmap Port Results ==="])
-        writer.writerow(["host", "port", "protocol", "service", "state", "product", "version"])
+        writer.writerow([
+            "host",
+            "port",
+            "protocol",
+            "service",
+            "state",
+            "product",
+            "version",
+            "risk_level",
+            "risk_score",
+            "risk_reason"
+        ])
 
         if port_results:
             for port in port_results:
                 writer.writerow([
-                    "source",
-                    "name",
-                    "severity",
-                    "confidence",
-                    "url",
-                    "description",
-                    "owasp_category",
-                    "verification_status",
-                    "verification_method",
-                    "verification_note"
+                    port.get("host", ""),
+                    port.get("port", ""),
+                    port.get("protocol", ""),
+                    port.get("service", ""),
+                    port.get("state", ""),
+                    port.get("product", ""),
+                    port.get("version", ""),
+                    port.get("risk_level", ""),
+                    port.get("risk_score", ""),
+                    port.get("risk_reason", "")
                 ])
         else:
             writer.writerow(["No port results"])
@@ -44,7 +55,21 @@ def generate_csv_report(findings: list[dict], port_results: list[dict]) -> str:
 
         # 🔹 취약점 결과 저장
         writer.writerow(["=== Security Findings ==="])
-        writer.writerow(["source", "name", "severity", "confidence", "url", "description"])
+        writer.writerow([
+            "source",
+            "name",
+            "severity",
+            "confidence",
+            "url",
+            "description",
+            "risk_level",
+            "risk_score",
+            "is_critical",
+            "owasp_category",
+            "verification_status",
+            "verification_method",
+            "verification_note"
+        ])
 
         if findings:
             for finding in findings:
@@ -55,6 +80,9 @@ def generate_csv_report(findings: list[dict], port_results: list[dict]) -> str:
                     finding.get("confidence", ""),
                     finding.get("url", ""),
                     finding.get("description", ""),
+                    finding.get("risk_level", ""),
+                    finding.get("risk_score", ""),
+                    finding.get("is_critical", ""),
                     finding.get("owasp_category", "Unmapped"),
                     finding.get("verification_status", "Need Manual Review"),
                     finding.get("verification_method", "Need Manual Review"),

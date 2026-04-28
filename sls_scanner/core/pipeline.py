@@ -1,5 +1,6 @@
 # sls_scanner/core/pipeline.py
 from sls_scanner.normalizers.header_normalizer import normalize_header_result
+from sls_scanner.evaluators.risk_evaluator import evaluate_risk, evaluate_port_risk
 # 대상 URL/IP 검증 함수를 가져온다.
 from sls_scanner.core.target import validate_target
 
@@ -57,7 +58,7 @@ def run_pipeline(target: str) -> None:
 
     # 5. ZAP Alert 결과를 프로젝트 표준 취약점 결과 형식으로 변환한다.
     zap_findings = normalize_zap_result(raw_zap_result)
-
+    evaluated_port_results = evaluate_port_risk(port_results)
     # 6. SQLMap 결과를 프로젝트 표준 취약점 결과 형식으로 변환한다.
     sqlmap_findings = normalize_sqlmap_result(raw_sqlmap_result)
 
@@ -74,14 +75,13 @@ def run_pipeline(target: str) -> None:
     # 9. HTML 리포트를 생성한다.
     html_report_path = generate_html_report(
         target=target,
-        port_results=port_results,
+        port_results=evaluated_port_results,
         findings=evaluated_findings
     )
 
-    # 10. CSV 리포트를 생성한다.
     csv_report_path = generate_csv_report(
         findings=evaluated_findings,
-        port_results=port_results
+        port_results=evaluated_port_results
     )
 
     # 생성된 리포트 경로를 출력한다.

@@ -42,12 +42,15 @@ def generate_html_report(
                 <td>{port.get("state", "")}</td>
                 <td>{port.get("product", "")}</td>
                 <td>{port.get("version", "")}</td>
+                <td>{port.get("risk_level", "")}</td>
+                <td>{port.get("risk_score", "")}</td>
+                <td>{port.get("risk_reason", "")}</td>
             </tr>
             """
     else:
         port_rows = """
         <tr>
-            <td colspan="7">포트 스캔 결과가 없습니다.</td>
+            <td colspan="10">포트 스캔 결과가 없습니다.</td>
         </tr>
         """
 
@@ -223,6 +226,9 @@ def generate_html_report(
                 <th>State</th>
                 <th>Product</th>
                 <th>Version</th>
+                <th>Risk Level</th>
+                <th>Risk Score</th>
+                <th>Risk Reason</th>
             </tr>
         </thead>
         <tbody>
