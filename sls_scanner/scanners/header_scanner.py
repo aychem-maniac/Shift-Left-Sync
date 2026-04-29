@@ -1,38 +1,76 @@
 # sls_scanner/scanners/header_scanner.py
 
+"""
+HTTP 응답 보안 헤더 점검 모듈.
+
+대상 URL에 HTTP 요청을 보내고, 주요 보안 헤더가 응답에 포함되어 있는지 확인한다.
+이 결과는 OWASP Top 10 중 A05 Security Misconfiguration 점검 항목으로 활용된다.
+"""
+
+from typing import Any
+
 import requests
 
-def run_header_scan(target: str) -> dict:
-    print("[INFO] Header scan started")
+
+REQUEST_TIMEOUT_SECONDS = 5
+
+SECURITY_HEADERS = [
+    "Content-Security-Policy",
+    "X-Frame-Options",
+    "Strict-Transport-Security",
+    "X-Content-Type-Options",
+]
+
+
+def _find_missing_headers(headers: requests.structures.CaseInsensitiveDict) -> list[str]:
+    """
+    응답 헤더에서 주요 보안 헤더 누락 여부를 확인한다.
+
+    Args:
+        headers (CaseInsensitiveDict): requests 응답 헤더 객체
+
+    Returns:
+        list[str]: 누락된 보안 헤더 이름 목록
+    """
+    return [
+        header_name
+        for header_name in SECURITY_HEADERS
+        if header_name not in headers
+    ]
+
+
+def run_header_scan(target: str) -> dict[str, Any]:
+    """
+    대상 URL의 HTTP 응답 보안 헤더를 점검한다.
+
+    Args:
+        target (str): 점검 대상 URL
+
+    Returns:
+        dict[str, Any]: 보안 헤더 점검 원시 결과
+    """
+    print(f"[INFO] Header scan started: {target}")
 
     try:
-        res = requests.get(target, timeout=5)
+        response = requests.get(target, timeout=REQUEST_TIMEOUT_SECONDS)
+        missing_headers = _find_missing_headers(response.headers)
 
-        headers = res.headers
-
-        security_headers = [
-            "Content-Security-Policy",
-            "X-Frame-Options",
-            "Strict-Transport-Security",
-            "X-Content-Type-Options"
-        ]
-
-        missing = []
-
-        for h in security_headers:
-            if h not in headers:
-                missing.append(h)
-
-        print(f"[INFO] Header scan completed: {len(missing)} missing")
+        print(f"[INFO] Header scan completed: {len(missing_headers)} missing")
 
         return {
             "target": target,
-            "missing_headers": missing
+            "status_code": response.status_code,
+            "checked_headers": SECURITY_HEADERS,
+            "missing_headers": missing_headers,
         }
 
-    except Exception as e:
+    except requests.RequestException as e:
         print(f"[ERROR] Header scan failed: {e}")
+
         return {
             "target": target,
-            "missing_headers": []
+            "status_code": None,
+            "checked_headers": SECURITY_HEADERS,
+            "missing_headers": [],
+            "error": str(e),
         }

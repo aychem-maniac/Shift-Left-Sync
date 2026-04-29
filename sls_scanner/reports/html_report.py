@@ -1,89 +1,178 @@
 # sls_scanner/reports/html_report.py
 
+"""
+HTML 보안 스캔 리포트 생성 모듈.
+
+Nmap 포트 스캔 결과와 ZAP/SQLMap/Header Scan 취약점 결과를
+하나의 HTML 파일로 저장한다.
+"""
+
 import os
-from datetime import datetime
 from collections import Counter
+from datetime import datetime
+from html import escape
+from typing import Any
 
 
-def generate_html_report(
-    target: str,
-    port_results: list[dict],
-    findings: list[dict]
-) -> str:
+REPORT_DIR = "results/reports"
+REPORT_FILENAME = "report.html"
+DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+
+def _safe_html(value: Any) -> str:
     """
-    Nmap 포트 결과와 취약점 결과를 HTML 리포트로 생성한다.
+    HTML에 출력할 값을 안전한 문자열로 변환한다.
+
+    취약점 설명이나 URL에 HTML 특수문자가 포함될 수 있으므로,
+    escape 처리를 통해 HTML 구조가 깨지지 않도록 한다.
+
+    Args:
+        value (Any): HTML에 출력할 값
+
+    Returns:
+        str: HTML escape 처리된 문자열
     """
+    return escape(str(value or ""))
 
-    print("[INFO] HTML report generation started")
 
-    # 리포트 저장 폴더를 생성한다.
-    report_dir = "results/reports"
-    os.makedirs(report_dir, exist_ok=True)
+def _get_severity_class(severity: str) -> str:
+    """
+    severity 값을 CSS class 이름에 사용할 수 있는 형태로 변환한다.
 
-    report_path = os.path.join(report_dir, "report.html")
-    generated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    Args:
+        severity (str): 취약점 severity 값
 
-    # 위험도별 개수를 계산한다.
-    severity_counts = Counter(
-        finding.get("severity", "Unknown") for finding in findings
+    Returns:
+        str: severity CSS class suffix
+    """
+    return str(severity or "Unknown").strip().lower()
+
+
+def _count_severity(findings: list[dict[str, Any]]) -> Counter:
+    """
+    findings 목록에서 severity별 개수를 계산한다.
+
+    Args:
+        findings (list[dict[str, Any]]): 취약점 finding 목록
+
+    Returns:
+        Counter: severity별 개수
+    """
+    return Counter(
+        finding.get("severity", "Unknown")
+        for finding in findings
     )
 
-    # 포트 결과 HTML 행을 생성한다.
-    port_rows = ""
 
-    if port_results:
-        for port in port_results:
-            port_rows += f"""
-            <tr>
-                <td>{port.get("host", "")}</td>
-                <td>{port.get("port", "")}</td>
-                <td>{port.get("protocol", "")}</td>
-                <td>{port.get("service", "")}</td>
-                <td>{port.get("state", "")}</td>
-                <td>{port.get("product", "")}</td>
-                <td>{port.get("version", "")}</td>
-                <td>{port.get("risk_level", "")}</td>
-                <td>{port.get("risk_score", "")}</td>
-                <td>{port.get("risk_reason", "")}</td>
-            </tr>
-            """
-    else:
-        port_rows = """
+def _build_port_rows(port_results: list[dict[str, Any]]) -> str:
+    """
+    Nmap 포트 결과를 HTML table row 문자열로 변환한다.
+
+    Args:
+        port_results (list[dict[str, Any]]): 위험도 평가가 완료된 포트 결과 목록
+
+    Returns:
+        str: 포트 결과 table row HTML
+    """
+    if not port_results:
+        return """
         <tr>
             <td colspan="10">포트 스캔 결과가 없습니다.</td>
         </tr>
         """
 
-    # 취약점 결과 HTML 행을 생성한다.
-    finding_rows = ""
+    rows = []
 
-    if findings:
-        for finding in findings:
-            severity = finding.get("severity", "Unknown")
-            severity_class = severity.lower()
-
-            finding_rows += f"""
+    for port in port_results:
+        rows.append(
+            f"""
             <tr>
-                <td>{finding.get("source", "")}</td>
-                <td>{finding.get("name", "")}</td>
-                <td class="severity-{severity_class}">{severity}</td>
-                <td>{finding.get("confidence", "")}</td>
-                <td>{finding.get("url", "")}</td>
-                <td>{finding.get("description", "")}</td>
-                <td>{finding.get("owasp_category", "Unmapped")}</td>
-                <td>{finding.get("verification_status", "Need Manual Review")}</td>
-                <td>{finding.get("verification_method", "Need Manual Review")}</td>
-                <td>{finding.get("verification_note", "")}</td>
+                <td>{_safe_html(port.get("host"))}</td>
+                <td>{_safe_html(port.get("port"))}</td>
+                <td>{_safe_html(port.get("protocol"))}</td>
+                <td>{_safe_html(port.get("service"))}</td>
+                <td>{_safe_html(port.get("state"))}</td>
+                <td>{_safe_html(port.get("product"))}</td>
+                <td>{_safe_html(port.get("version"))}</td>
+                <td>{_safe_html(port.get("risk_level"))}</td>
+                <td>{_safe_html(port.get("risk_score"))}</td>
+                <td>{_safe_html(port.get("risk_reason"))}</td>
             </tr>
             """
-    else:
-        finding_rows = """
+        )
+
+    return "\n".join(rows)
+
+
+def _build_finding_rows(findings: list[dict[str, Any]]) -> str:
+    """
+    취약점 finding 결과를 HTML table row 문자열로 변환한다.
+
+    Args:
+        findings (list[dict[str, Any]]): 위험도 평가가 완료된 취약점 finding 목록
+
+    Returns:
+        str: 취약점 결과 table row HTML
+    """
+    if not findings:
+        return """
         <tr>
             <td colspan="10">취약점 결과가 없습니다.</td>
         </tr>
         """
 
-    html_content = f"""
+    rows = []
+
+    for finding in findings:
+        severity = finding.get("severity", "Unknown")
+        severity_class = _get_severity_class(severity)
+
+        rows.append(
+            f"""
+            <tr>
+                <td>{_safe_html(finding.get("source"))}</td>
+                <td>{_safe_html(finding.get("name"))}</td>
+                <td class="severity-{_safe_html(severity_class)}">{_safe_html(severity)}</td>
+                <td>{_safe_html(finding.get("confidence"))}</td>
+                <td>{_safe_html(finding.get("url"))}</td>
+                <td>{_safe_html(finding.get("description"))}</td>
+                <td>{_safe_html(finding.get("owasp_category", "Unmapped"))}</td>
+                <td>{_safe_html(finding.get("verification_status", "Need Manual Review"))}</td>
+                <td>{_safe_html(finding.get("verification_method", "Need Manual Review"))}</td>
+                <td>{_safe_html(finding.get("verification_note"))}</td>
+            </tr>
+            """
+        )
+
+    return "\n".join(rows)
+
+
+def _build_html_content(
+    *,
+    target: str,
+    generated_at: str,
+    port_results: list[dict[str, Any]],
+    findings: list[dict[str, Any]],
+    severity_counts: Counter,
+    port_rows: str,
+    finding_rows: str,
+) -> str:
+    """
+    HTML 리포트 전체 문서를 생성한다.
+
+    Args:
+        target (str): 점검 대상
+        generated_at (str): 리포트 생성 시각
+        port_results (list[dict[str, Any]]): 포트 결과 목록
+        findings (list[dict[str, Any]]): 취약점 결과 목록
+        severity_counts (Counter): severity별 취약점 개수
+        port_rows (str): 포트 결과 table row HTML
+        finding_rows (str): 취약점 결과 table row HTML
+
+    Returns:
+        str: 전체 HTML 문서 문자열
+    """
+    return f"""
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -190,8 +279,8 @@ def generate_html_report(
     <h1>Shift-Left-Sync Scan Report</h1>
 
     <div class="summary">
-        <p><strong>Target:</strong> {target}</p>
-        <p><strong>Generated At:</strong> {generated_at}</p>
+        <p><strong>Target:</strong> {_safe_html(target)}</p>
+        <p><strong>Generated At:</strong> {_safe_html(generated_at)}</p>
         <p><strong>Open Port Results:</strong> {len(port_results)}</p>
         <p><strong>Finding Results:</strong> {len(findings)}</p>
 
@@ -259,6 +348,44 @@ def generate_html_report(
 </body>
 </html>
 """
+
+
+def generate_html_report(
+    target: str,
+    port_results: list[dict[str, Any]],
+    findings: list[dict[str, Any]],
+) -> str:
+    """
+    Nmap 포트 결과와 취약점 결과를 HTML 리포트로 생성한다.
+
+    Args:
+        target (str): 점검 대상 URL 또는 IP
+        port_results (list[dict[str, Any]]): 위험도 평가가 완료된 포트 결과 목록
+        findings (list[dict[str, Any]]): 위험도 평가가 완료된 취약점 finding 목록
+
+    Returns:
+        str: 생성된 HTML 리포트 파일 경로
+    """
+    print("[INFO] HTML report generation started")
+
+    os.makedirs(REPORT_DIR, exist_ok=True)
+
+    report_path = os.path.join(REPORT_DIR, REPORT_FILENAME)
+    generated_at = datetime.now().strftime(DATETIME_FORMAT)
+
+    severity_counts = _count_severity(findings)
+    port_rows = _build_port_rows(port_results)
+    finding_rows = _build_finding_rows(findings)
+
+    html_content = _build_html_content(
+        target=target,
+        generated_at=generated_at,
+        port_results=port_results,
+        findings=findings,
+        severity_counts=severity_counts,
+        port_rows=port_rows,
+        finding_rows=finding_rows,
+    )
 
     with open(report_path, "w", encoding="utf-8") as file:
         file.write(html_content)
