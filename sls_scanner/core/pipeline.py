@@ -1,102 +1,105 @@
 # sls_scanner/core/pipeline.py
 
-# 대상 URL/IP 검증 함수를 가져온다.
+from datetime import datetime
+
 from sls_scanner.core.target import validate_target
-
-# A05 연결
-from sls_scanner.scanners.header_scanner import run_header_scan
-
-# 공통 예외 클래스를 가져온다.
 from sls_scanner.core.exceptions import InvalidTargetError
 
-# Nmap, ZAP, SQLMap 스캔 함수를 가져온다.
-from sls_scanner.scanners.nmap_scanner import run_nmap_scan
-from sls_scanner.scanners.zap_scanner import run_zap_scan
-from sls_scanner.scanners.sqlmap_scanner import run_sqlmap_scan
+# ── 스캐너 ────────────────────────────────────────────────────
+from sls_scanner.scanners.nmap_scanner    import run_nmap_scan
+from sls_scanner.scanners.zap_scanner     import run_zap_scan
+from sls_scanner.scanners.sqlmap_scanner  import run_sqlmap_scan
+from sls_scanner.scanners.header_scanner  import run_header_scan
+from sls_scanner.scanners.nikto_scanner   import NiktoScanner
+from sls_scanner.scanners.nuclei_scanner  import NucleiScanner
 
-# 정규화 함수를 가져온다.
-from sls_scanner.normalizers.nmap_normalizer import normalize_nmap_result
-from sls_scanner.normalizers.zap_normalizer import normalize_zap_result
-from sls_scanner.normalizers.sqlmap_normalizer import normalize_sqlmap_result
+# ── 정규화 ────────────────────────────────────────────────────
+from sls_scanner.normalizers.normalizer import (
+    normalize_zap, normalize_nmap, normalize_sqlmap,
+    normalize_header, normalize_nikto, normalize_nuclei,
+    merge_and_sort, to_dict_list,
+)
 
-# 위험도 평가 함수를 가져온다.
-from sls_scanner.evaluators.risk_evaluator import evaluate_risk
+# ── PoC 검증 ─────────────────────────────────────────────────
+from sls_scanner.verifiers.poc_verifier import dispatch as poc_dispatch
 
-# 리포트 생성 함수를 가져온다.
-from sls_scanner.reports.html_report import generate_html_report
-from sls_scanner.reports.csv_report import generate_csv_report
+# ── 리포트 ────────────────────────────────────────────────────
+from sls_scanner.reports.reporter import (
+    make_paths, export_csv, export_json, export_html, print_summary
+)
 
 
-def run_pipeline(target: str) -> None:
-    # 사용자가 입력한 점검 대상을 출력한다.
-    print(f"[INFO] Target: {target}")
+def run_pipeline(target: str, strength: str = "medium") -> None:
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    # 대상 URL/IP 형식이 올바른지 확인한다.
+    print(f"[INFO] Target:   {target}")
+    print(f"[INFO] Strength: {strength}")
+
     if not validate_target(target):
         raise InvalidTargetError(f"Invalid target: {target}")
 
-    # 전체 파이프라인 시작 메시지를 출력한다.
     print("[INFO] Pipeline started")
 
-    # 1. Nmap 스캔을 실행한다.
-    # 포트 상태, 서비스 이름, 제품명, 버전 정보를 수집한다.
-    raw_nmap_result = run_nmap_scan(target)
+    # ── 1. 스캔 ───────────────────────────────────────────────
+    raw_nmap    = run_nmap_scan(target)
+    raw_zap     = run_zap_scan(target, strength=strength)
+    raw_sqlmap  = run_sqlmap_scan(target)
+    raw_header  = run_header_scan(target)
+    raw_nikto   = NiktoScanner(target=target, strength=strength).run()
+    raw_nuclei  = NucleiScanner(target=target, strength=strength).run()
 
-    # 2. OWASP ZAP 스캔을 실행한다.
-    # Spider와 Passive Scan을 통해 웹 취약점 Alert를 수집한다.
-    raw_zap_result = run_zap_scan(target)
+    # ── 2. 정규화 ─────────────────────────────────────────────
+    vulns = []
+    vulns.extend(normalize_zap(raw_zap.get("raw_alerts", [])))
+    vulns.extend(normalize_nmap(raw_nmap))
+    vulns.extend(normalize_sqlmap(raw_sqlmap))
+    vulns.extend(normalize_header(raw_header))
+    vulns.extend(normalize_nikto(raw_nikto))
+    vulns.extend(normalize_nuclei(raw_nuclei))
 
-    # 3. SQLMap 스캔을 실행한다.
-    # SQL Injection 가능성을 자동 점검한다.
-    raw_sqlmap_result = run_sqlmap_scan(target)
-    # A05 검사
-    raw_header_result = run_header_scan(target)
+    vulns = merge_and_sort(vulns)
+    print(f"[INFO] Normalized findings: {len(vulns)}건")
 
-    # 4. Nmap 원시 결과를 프로젝트 표준 포트 결과 형식으로 변환한다.
-    port_results = normalize_nmap_result(raw_nmap_result)
+    # ── 3. PoC 검증 ───────────────────────────────────────────
+    print("[INFO] PoC verification started")
+    vuln_dicts = to_dict_list(vulns)
+    for v in vuln_dicts:
+        poc_dispatch(v)
 
-    # 5. ZAP Alert 결과를 프로젝트 표준 취약점 결과 형식으로 변환한다.
-    zap_findings = normalize_zap_result(raw_zap_result)
+    # ── 4. 리포트 생성 ────────────────────────────────────────
+    paths = make_paths(target=target, timestamp=timestamp)
 
-    # 6. SQLMap 결과를 프로젝트 표준 취약점 결과 형식으로 변환한다.
-    sqlmap_findings = normalize_sqlmap_result(raw_sqlmap_result)
+    confirmed   = [v for v in vuln_dicts if v.get("poc_status") == "CONFIRMED"]
+    false_pos   = [v for v in vuln_dicts if v.get("poc_status") == "FALSE_POSITIVE"]
+    unverified  = [v for v in vuln_dicts if v.get("poc_status") in ("UNVERIFIED", "PENDING")]
 
-    # 7. ZAP 결과와 SQLMap 결과를 하나의 취약점 목록으로 합친다.
-    findings = zap_findings + sqlmap_findings
+    # Nmap 포트 정보 (HTML용)
+    port_info = []
+    raw_result = raw_nmap.get("raw_result", {})
+    for host, host_data in raw_result.items():
+        for proto, ports in host_data.items():
+            for port, pdata in ports.items():
+                port_info.append({
+                    "host": host, "port": port, "protocol": proto,
+                    "service": pdata.get("name", ""),
+                    "state":   pdata.get("state", ""),
+                    "product": pdata.get("product", ""),
+                    "version": pdata.get("version", ""),
+                })
 
-    header_findings = []
-
-    for h in raw_header_result["missing_headers"]:
-        header_findings.append({
-            "source": "header_scan",
-            "name": f"Missing Security Header: {h}",
-            "severity": "Medium",
-            "confidence": "High",
-            "url": target,
-            "description": f"{h} header is not set."
-        })
-
-    findings = findings + header_findings
-    # 8. 취약점 위험도를 평가한다.
-    # severity 기준으로 risk_score와 is_critical 값을 추가한다.
-    evaluated_findings = evaluate_risk(findings)
-
-    # 9. HTML 리포트를 생성한다.
-    html_report_path = generate_html_report(
+    export_csv(confirmed,  paths["csv_confirmed"])
+    export_csv(false_pos,  paths["csv_false_positive"])
+    export_csv(unverified, paths["csv_unverified"])
+    export_csv(vuln_dicts, paths["csv_full"])
+    export_json(vuln_dicts, paths["json_full"])
+    export_html(
         target=target,
-        port_results=port_results,
-        findings=evaluated_findings
+        vulns=vuln_dicts,
+        port_info=port_info,
+        path=paths["html"],
+        timestamp=timestamp,
     )
 
-    # 10. CSV 리포트를 생성한다.
-    csv_report_path = generate_csv_report(
-        findings=evaluated_findings,
-        port_results=port_results
-    )
-
-    # 생성된 리포트 경로를 출력한다.
-    print(f"[INFO] HTML report path: {html_report_path}")
-    print(f"[INFO] CSV report path: {csv_report_path}")
-
-    # 전체 파이프라인 종료 메시지를 출력한다.
-    print("[INFO] Pipeline completed")
+    print_summary(vuln_dicts)
+    print(f"[INFO] HTML report: {paths['html']}")
+    print(f"[INFO] Pipeline completed")
