@@ -3,3 +3,9 @@ __pycache__/
 .pytest_cache/
 .venv/
 .env
+results/reports/
+results/sqlmap/
+sls_scanner/scanners/1.env
+*.csv
+*.json
+*.html

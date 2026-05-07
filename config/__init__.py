@@ -1,0 +1,4 @@
+from config.settings import (
+    ZAP_ADDRESS, ZAP_PORT, ZAP_API_KEY,
+    OWASP_MAP, RISK_ORDER, SCAN_STRENGTH, ZAP_STRENGTH_MAP,
+)

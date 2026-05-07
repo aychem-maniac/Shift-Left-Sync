@@ -61,7 +61,8 @@ class NucleiScanner:
         print(f"\n  [Nuclei] 스캔 시작 (태그: {tags_str})...")
         try:
             result = subprocess.run(
-                cmd, capture_output=True, text=True, timeout=600
+                cmd, capture_output=True, text=True,
+                encoding="utf-8", errors="replace", timeout=600
             )
             if result.returncode not in (0, 1):
                 print(f"  [Nuclei] 실행 오류 (code={result.returncode}): {result.stderr[:150]}")
