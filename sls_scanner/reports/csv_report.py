@@ -29,19 +29,25 @@ PORT_COLUMNS = [
     "risk_level",
     "risk_score",
     "risk_reason",
+    "cvss_rule",
 ]
 
 FINDING_COLUMNS = [
     "source",
     "name",
+    "category",
     "severity",
     "confidence",
     "url",
     "description",
+    "evidence",
     "risk_level",
     "risk_score",
+    "risk_reason",
+    "cvss_rule",
     "is_critical",
     "owasp_category",
+    "recommendation",
     "verification_status",
     "verification_method",
     "verification_note",
@@ -69,6 +75,7 @@ def _build_port_row(port: dict[str, Any]) -> list[Any]:
         port.get("risk_level", ""),
         port.get("risk_score", ""),
         port.get("risk_reason", ""),
+        port.get("cvss_rule", ""),
     ]
 
 
@@ -85,14 +92,19 @@ def _build_finding_row(finding: dict[str, Any]) -> list[Any]:
     return [
         finding.get("source", ""),
         finding.get("name", ""),
+        finding.get("category", ""),
         finding.get("severity", ""),
         finding.get("confidence", ""),
         finding.get("url", ""),
         finding.get("description", ""),
+        finding.get("evidence", ""),
         finding.get("risk_level", ""),
         finding.get("risk_score", ""),
+        finding.get("risk_reason", ""),
+        finding.get("cvss_rule", ""),
         finding.get("is_critical", ""),
         finding.get("owasp_category", "Unmapped"),
+        finding.get("recommendation", ""),
         finding.get("verification_status", "Need Manual Review"),
         finding.get("verification_method", "Need Manual Review"),
         finding.get("verification_note", ""),

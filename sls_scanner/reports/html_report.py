@@ -77,7 +77,7 @@ def _build_port_rows(port_results: list[dict[str, Any]]) -> str:
     if not port_results:
         return """
         <tr>
-            <td colspan="10">포트 스캔 결과가 없습니다.</td>
+            <td colspan="11">포트 스캔 결과가 없습니다.</td>
         </tr>
         """
 
@@ -97,6 +97,7 @@ def _build_port_rows(port_results: list[dict[str, Any]]) -> str:
                 <td>{_safe_html(port.get("risk_level"))}</td>
                 <td>{_safe_html(port.get("risk_score"))}</td>
                 <td>{_safe_html(port.get("risk_reason"))}</td>
+                <td>{_safe_html(port.get("cvss_rule"))}</td>
             </tr>
             """
         )
@@ -117,7 +118,7 @@ def _build_finding_rows(findings: list[dict[str, Any]]) -> str:
     if not findings:
         return """
         <tr>
-            <td colspan="10">취약점 결과가 없습니다.</td>
+            <td colspan="14">취약점 결과가 없습니다.</td>
         </tr>
         """
 
@@ -132,14 +133,18 @@ def _build_finding_rows(findings: list[dict[str, Any]]) -> str:
             <tr>
                 <td>{_safe_html(finding.get("source"))}</td>
                 <td>{_safe_html(finding.get("name"))}</td>
+                <td>{_safe_html(finding.get("category"))}</td>
                 <td class="severity-{_safe_html(severity_class)}">{_safe_html(severity)}</td>
                 <td>{_safe_html(finding.get("confidence"))}</td>
                 <td>{_safe_html(finding.get("url"))}</td>
                 <td>{_safe_html(finding.get("description"))}</td>
+                <td>{_safe_html(finding.get("evidence"))}</td>
+                <td>{_safe_html(finding.get("risk_level"))}</td>
+                <td>{_safe_html(finding.get("risk_score"))}</td>
+                <td>{_safe_html(finding.get("risk_reason"))}</td>
                 <td>{_safe_html(finding.get("owasp_category", "Unmapped"))}</td>
+                <td>{_safe_html(finding.get("recommendation"))}</td>
                 <td>{_safe_html(finding.get("verification_status", "Need Manual Review"))}</td>
-                <td>{_safe_html(finding.get("verification_method", "Need Manual Review"))}</td>
-                <td>{_safe_html(finding.get("verification_note"))}</td>
             </tr>
             """
         )
@@ -318,6 +323,7 @@ def _build_html_content(
                 <th>Risk Level</th>
                 <th>Risk Score</th>
                 <th>Risk Reason</th>
+                <th>CVSS Rule</th>
             </tr>
         </thead>
         <tbody>
@@ -331,14 +337,18 @@ def _build_html_content(
             <tr>
                 <th>Source</th>
                 <th>Name</th>
+                <th>Category</th>
                 <th>Severity</th>
                 <th>Confidence</th>
                 <th>URL</th>
                 <th>Description</th>
+                <th>Evidence</th>
+                <th>Risk Level</th>
+                <th>Risk Score</th>
+                <th>Risk Reason</th>
                 <th>OWASP Top 10</th>
+                <th>Recommendation</th>
                 <th>Verification Status</th>
-                <th>Verification Method</th>
-                <th>Verification Note</th>
             </tr>
         </thead>
         <tbody>
