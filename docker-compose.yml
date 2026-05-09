@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+
+  # ── OWASP ZAP 데몬 컨테이너 ───────────────────────────────
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:stable
+    container_name: sls_zap
+    command: >
+      zap.sh -daemon
+      -host 0.0.0.0
+      -port 8080
+      -config api.disablekey=true
+      -config api.addrs.addr.name=.*
+      -config api.addrs.addr.regex=true
+      -config scanner.threadPerHost=5
+    ports:
+      - "8080:8080"
+    networks:
+      - sls_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8080/JSON/core/view/version/"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+
+  # ── 스캐너 + FastAPI 서버 컨테이너 ────────────────────────
+  scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sls_scanner
+    ports:
+      - "8000:8000"
+    environment:
+      - ZAP_ADDRESS=zap     # Docker 내부 네트워크 서비스명
+      - ZAP_PORT=8080
+      - ZAP_API_KEY=
+    volumes:
+      - ./results:/app/results   # 리포트 로컬 저장
+    networks:
+      - sls_net
+    depends_on:
+      zap:
+        condition: service_healthy
+    restart: unless-stopped
+
+networks:
+  sls_net:
+    driver: bridge
