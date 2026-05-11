@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shift-Left-Sync 보안 스캐너</title>
+
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --header: #202a52;
+      --panel: #151b2d;
+      --panel-dark: #0f1423;
+      --input: #070b12;
+      --border: #2b365c;
+      --blue: #4ea8ff;
+      --blue-dark: #1f7ae0;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f97316;
+      --medium: #facc15;
+      --low: #22c55e;
+      --info: #38bdf8;
+      --gray: #6b7280;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, "Noto Sans KR", sans-serif;
+    }
+
+    header {
+      padding: 34px 54px 32px;
+      background: linear-gradient(90deg, #1a2442, var(--header));
+      border-bottom: 1px solid var(--border);
+    }
+
+    header h1 {
+      margin: 0 0 12px;
+      color: var(--blue);
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    main {
+      max-width: 1080px;
+      margin: 52px auto;
+      padding: 0 24px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 34px 38px;
+      margin-bottom: 26px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .card h2 {
+      margin: 0 0 24px;
+      color: var(--blue);
+      font-size: 21px;
+    }
+
+    .section-title {
+      margin: 24px 0 12px;
+      color: #dbeafe;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .url-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      height: 48px;
+      background: var(--input);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 0 16px;
+      outline: none;
+      font-size: 15px;
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      border-color: var(--blue);
+    }
+
+    button {
+      border: none;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.15s;
+    }
+
+    button:hover:not(:disabled) {
+      filter: brightness(1.12);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-add {
+      width: 82px;
+      background: #2d3a73;
+      color: var(--text);
+    }
+
+    .btn-remove {
+      width: 42px;
+      height: 36px;
+      background: #2d3a73;
+      color: var(--text);
+      margin-left: 12px;
+      font-size: 18px;
+    }
+
+    .btn-start {
+      height: 52px;
+      min-width: 150px;
+      background: var(--blue-dark);
+      color: white;
+      font-size: 16px;
+      padding: 0 22px;
+    }
+
+    .target-list {
+      margin: 16px 0 8px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .target-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      padding: 8px 0;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(43, 54, 92, 0.45);
+    }
+
+    .form-line {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .strength-select {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .mode-box {
+      margin-top: 14px;
+      background: #0d1324;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .scanner-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .scanner-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #0d1324;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .scanner-card input {
+      width: 16px;
+      height: 16px;
+    }
+
+    .permission-box {
+      margin-top: 22px;
+      background: #1d1721;
+      border: 1px solid #4b2f3d;
+      color: #f3d4d4;
+      padding: 15px 16px;
+      border-radius: 10px;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .permission-box label {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      cursor: pointer;
+    }
+
+    .permission-box input {
+      margin-top: 4px;
+    }
+
+    .payload-preview {
+      margin-top: 14px;
+      background: #070b12;
+      border: 1px solid var(--border);
+      color: #a7f3d0;
+      padding: 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .message {
+      margin-top: 16px;
+      min-height: 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .message.success {
+      color: #86efac;
+    }
+
+    .message.error {
+      color: #fca5a5;
+    }
+
+    .message.info {
+      color: #93c5fd;
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 14px;
+      padding: 18px;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      background: #0d1324;
+    }
+
+    .job-card {
+      background: #0d1324;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+    }
+
+    .job-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .job-id {
+      color: var(--blue);
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .job-meta {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      color: white;
+      white-space: nowrap;
+    }
+
+    .badge.pending,
+    .badge.waiting {
+      background: var(--gray);
+    }
+
+    .badge.running {
+      background: #2563eb;
+    }
+
+    .badge.done {
+      background: #16a34a;
+    }
+
+    .badge.error {
+      background: #dc2626;
+    }
+
+    .progress-wrap {
+      width: 100%;
+      height: 9px;
+      background: #111827;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      margin-top: 14px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #2563eb, #4ea8ff);
+      transition: width 0.3s ease;
+    }
+
+    .steps {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0f1423;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-size: 14px;
+    }
+
+    .step-name {
+      color: var(--text);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin: 18px 0 22px;
+    }
+
+    .summary-card {
+      background: #0d1324;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 14px;
+      text-align: center;
+    }
+
+    .summary-card strong {
+      display: block;
+      font-size: 25px;
+      margin-bottom: 6px;
+    }
+
+    .summary-card span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .critical strong { color: var(--danger); }
+    .high strong { color: var(--warning); }
+    .medium strong { color: var(--medium); }
+    .low strong { color: var(--low); }
+    .info strong { color: var(--info); }
+    .unknown strong { color: var(--gray); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #253051;
+      padding: 13px 12px;
+      text-align: left;
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    th {
+      color: #bfdbfe;
+      background: #0d1324;
+    }
+
+    td {
+      color: #d1d5db;
+    }
+
+    .report-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .report-link {
+      display: inline-block;
+      background: #155e9f;
+      color: white;
+      text-decoration: none;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .report-link:hover {
+      filter: brightness(1.12);
+    }
+
+    .result-info {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .scanner-grid {
+        grid-template-columns: repeat(2, minmax(160px, 1fr));
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 760px) {
+      header {
+        padding: 28px 24px;
+      }
+
+      main {
+        margin: 32px auto;
+      }
+
+      .card {
+        padding: 26px 22px;
+      }
+
+      .url-row {
+        flex-direction: column;
+      }
+
+      .btn-add {
+        width: 100%;
+        height: 44px;
+      }
+
+      .form-line {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn-start {
+        width: 100%;
+      }
+
+      .job-header {
+        flex-direction: column;
+      }
+
+      .scanner-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <h1>🛡 Shift-Left-Sync 보안 스캐너</h1>
+  <p>URL을 입력하면 Docker 환경에서 자동으로 보안 취약점을 분석합니다.</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>스캔 대상 입력</h2>
+
+    <div class="url-row">
+      <input
+        id="targetInput"
+        type="text"
+        placeholder="예: http://localhost:3000"
+        value="http://218.156.136.153:3000"
+        onkeydown="handleTargetEnter(event)"
+      />
+      <button class="btn-add" type="button" onclick="addTarget()">+ 추가</button>
+    </div>
+
+    <ul id="targetList" class="target-list"></ul>
+
+    <div class="section-title">스캔 강도 선택</div>
+
+    <div class="form-line">
+      <select id="scanStrength" class="strength-select" onchange="updateStrengthDescription(); updatePayloadPreview();">
+        <option value="low">🟢 low — 간단 점검</option>
+        <option value="medium" selected>🟡 medium — 표준 점검</option>
+        <option value="high">🔴 high — 심화 점검</option>
+      </select>
+
+      <button id="startButton" class="btn-start" type="button" onclick="startScan()" disabled>
+        ▶ 스캔 시작
+      </button>
+    </div>
+
+    <div id="strengthDescription" class="mode-box"></div>
+
+    <div class="section-title">사용할 스캐너 선택</div>
+
+    <div class="scanner-grid">
+        <label class="scanner-card">
+  	<input id="scannerNikto" type="checkbox" checked onchange="updatePayloadPreview()" />
+ 	Nikto Scan
+      </label>
+
+	<label class="scanner-card">
+  	<input id="scannerNuclei" type="checkbox" checked onchange="updatePayloadPreview()" />
+  	Nuclei Scan
+      </label>
+
+	<label class="scanner-card">
+        <input id="scannerHeader" type="checkbox" checked onchange="updatePayloadPreview()" />
+        Header Scan
+      </label>
+
+      <label class="scanner-card">
+        <input id="scannerZap" type="checkbox" checked onchange="updatePayloadPreview()" />
+        ZAP Scan
+      </label>
+
+      <label class="scanner-card">
+        <input id="scannerNmap" type="checkbox" checked onchange="updatePayloadPreview()" />
+        Nmap Scan
+      </label>
+
+      <label class="scanner-card">
+        <input id="scannerSqlmap" type="checkbox" onchange="updatePayloadPreview()" />
+        SQLMap
+      </label>
+
+      <label class="scanner-card">
+        <input id="scannerStatic" type="checkbox" onchange="updatePayloadPreview()" />
+        Static Code Scan
+      </label>
+
+      <label class="scanner-card">
+        <input id="scannerCookie" type="checkbox" checked onchange="updatePayloadPreview()" />
+        Cookie Check
+      </label>
+    </div>
+
+    <div class="permission-box">
+      <label>
+        <input id="permissionCheck" type="checkbox" onchange="handlePermissionChange(); updatePayloadPreview();" />
+        <span>
+          본인은 해당 대상에 대한 보안 점검 권한이 있음을 확인합니다.
+          무단 스캔으로 인한 책임은 사용자에게 있습니다.
+        </span>
+      </label>
+    </div>
+
+    <div class="section-title">백엔드로 전송될 요청값</div>
+    <pre id="payloadPreview" class="payload-preview"></pre>
+
+    <div id="messageArea" class="message"></div>
+  </section>
+
+  <section class="card">
+    <h2>스캔 상태</h2>
+
+    <div id="jobArea" class="empty">
+      아직 실행된 스캔이 없습니다.
+    </div>
+
+    <div id="stepArea" class="steps"></div>
+  </section>
+
+  <section class="card">
+    <h2>스캔 결과</h2>
+
+    <div id="resultArea" class="empty">
+      스캔 완료 후 결과 요약이 표시됩니다.
+    </div>
+
+    <div id="reportArea" class="empty" style="margin-top:16px;">
+      스캔 완료 후 리포트가 표시됩니다.
+    </div>
+  </section>
+</main>
+
+<script>
+  let targets = ["http://218.156.136.153:3000"];
+  let currentJobId = null;
+  let pollingTimer = null;
+
+  const strengthDescriptions = {
+    low: [
+      "현재 강도: low — 간단 점검",
+      "- 비교적 빠른 점검을 목표로 합니다.",
+      "- 기본 Header / 응답 상태 / 일부 자동화 점검 중심입니다.",
+      "- 예상 소요 시간: 짧음",
+      "- 운영 환경에서도 상대적으로 부담이 적은 점검을 목표로 합니다."
+    ],
+    medium: [
+      "현재 강도: medium — 표준 점검",
+      "- 기본 점검과 주요 취약점 점검을 함께 수행합니다.",
+      "- 일반적인 개발/스테이징 환경 점검에 적합합니다.",
+      "- 예상 소요 시간: 15~30분",
+      "- 프로젝트 기본 권장 모드입니다."
+    ],
+    high: [
+      "현재 강도: high — 심화 점검",
+      "- 더 강한 취약점 점검을 수행할 수 있습니다.",
+      "- 요청 수와 스캔 시간이 증가할 수 있습니다.",
+      "- 테스트/스테이징 환경에서 사용하는 것을 권장합니다.",
+      "- 운영 서비스에 직접 사용할 경우 장애 가능성을 고려해야 합니다."
+    ]
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    renderTargetList();
+    updateStrengthDescription();
+    updatePayloadPreview();
+    handlePermissionChange();
+    renderSteps([]);
+  });
+
+  function handleTargetEnter(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      addTarget();
+    }
+  }
+
+  function addTarget() {
+    const input = document.getElementById("targetInput");
+    const value = input.value.trim();
+
+    if (!value) {
+      showMessage("URL을 입력해주세요.", "error");
+      return;
+    }
+
+    if (!isValidUrl(value)) {
+      showMessage("URL은 http:// 또는 https:// 로 시작해야 합니다.", "error");
+      return;
+    }
+
+    if (!targets.includes(value)) {
+      targets.push(value);
+      showMessage("스캔 대상이 추가되었습니다.", "success");
+    } else {
+      showMessage("이미 추가된 URL입니다.", "info");
+    }
+
+    input.value = "";
+    renderTargetList();
+    updatePayloadPreview();
+  }
+
+  function removeTarget(index) {
+    targets.splice(index, 1);
+    renderTargetList();
+    updatePayloadPreview();
+
+    if (targets.length === 0) {
+      showMessage("스캔 대상이 비어 있습니다. URL을 추가해주세요.", "error");
+    }
+  }
+
+  function renderTargetList() {
+    const list = document.getElementById("targetList");
+    list.innerHTML = "";
+
+    targets.forEach((target, index) => {
+      const li = document.createElement("li");
+
+      li.innerHTML = `
+        <span>${escapeHtml(target)}</span>
+        <button class="btn-remove" type="button" onclick="removeTarget(${index})">×</button>
+      `;
+
+      list.appendChild(li);
+    });
+  }
+
+  function updateStrengthDescription() {
+    const strength = document.getElementById("scanStrength").value;
+    const box = document.getElementById("strengthDescription");
+
+    box.innerHTML = strengthDescriptions[strength].join("<br>");
+  }
+
+  function getScannerOptions() {
+    return {
+      header: document.getElementById("scannerHeader").checked,
+      zap: document.getElementById("scannerZap").checked,
+      nmap: document.getElementById("scannerNmap").checked,
+      sqlmap: document.getElementById("scannerSqlmap").checked,
+      static_code: document.getElementById("scannerStatic").checked,
+      cookie: document.getElementById("scannerCookie").checked
+    };
+  }
+
+  function getPayload() {
+    const strength = document.getElementById("scanStrength").value;
+    const permissionConfirmed = document.getElementById("permissionCheck").checked;
+
+    return {
+      targets: targets,
+      strength: strength,
+      permission_confirmed: permissionConfirmed,
+      scanners: getScannerOptions()
+    };
+  }
+
+  function updatePayloadPreview() {
+    const preview = document.getElementById("payloadPreview");
+    preview.textContent = JSON.stringify(getPayload(), null, 2);
+  }
+
+  function handlePermissionChange() {
+    const checked = document.getElementById("permissionCheck").checked;
+    const button = document.getElementById("startButton");
+
+    button.disabled = !checked;
+  }
+
+  async function startScan() {
+    if (targets.length === 0) {
+      showMessage("스캔 대상을 1개 이상 추가해주세요.", "error");
+      return;
+    }
+
+    const permissionCheck = document.getElementById("permissionCheck");
+
+    if (!permissionCheck.checked) {
+      showMessage("스캔 권한 확인 체크가 필요합니다.", "error");
+      return;
+    }
+
+    const payload = getPayload();
+
+    showMessage("스캔 요청을 전송 중입니다...", "info");
+    setStartButtonLoading(true);
+    clearResultAndReports();
+    renderSteps([]);
+
+    try {
+      const response = await fetch("/scan", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`스캔 요청 실패: HTTP ${response.status} ${errorText}`);
+      }
+
+      const data = await response.json();
+
+      currentJobId = data.job_id;
+
+      if (!currentJobId) {
+        throw new Error("백엔드 응답에 job_id가 없습니다.");
+      }
+
+      renderJob(data);
+      renderSteps(data.steps || []);
+      showMessage(`스캔이 시작되었습니다. Job ID: ${currentJobId}`, "success");
+
+      startPolling(currentJobId);
+
+    } catch (error) {
+      console.error(error);
+      showMessage("스캔 요청 중 오류가 발생했습니다. 콘솔을 확인해주세요.", "error");
+    } finally {
+      setStartButtonLoading(false);
+    }
+  }
+
+  function startPolling(jobId) {
+    if (pollingTimer) {
+      clearInterval(pollingTimer);
+    }
+
+    pollingTimer = setInterval(async () => {
+      try {
+        const response = await fetch(`/scan/${jobId}`);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`상태 조회 실패: HTTP ${response.status} ${errorText}`);
+        }
+
+        const data = await response.json();
+
+        renderJob(data);
+        renderSteps(data.steps || []);
+
+        if (data.status === "done") {
+          clearInterval(pollingTimer);
+          pollingTimer = null;
+
+          showMessage("스캔이 완료되었습니다. 결과를 불러오는 중입니다.", "success");
+          await loadResult(jobId);
+        }
+
+        if (data.status === "error") {
+          clearInterval(pollingTimer);
+          pollingTimer = null;
+
+          renderReports(data);
+          renderErrorResult(data);
+          showMessage("스캔 중 오류가 발생했습니다.", "error");
+        }
+
+      } catch (error) {
+        console.error(error);
+        clearInterval(pollingTimer);
+        pollingTimer = null;
+
+        showMessage("상태 조회 중 오류가 발생했습니다.", "error");
+      }
+    }, 2000);
+  }
+
+  async function loadResult(jobId) {
+    try {
+      const response = await fetch(`/scan/${jobId}/result`);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`결과 조회 실패: HTTP ${response.status} ${errorText}`);
+      }
+
+      const result = await response.json();
+
+      renderResult(result);
+      renderReports(result);
+      showMessage("스캔 결과 조회가 완료되었습니다.", "success");
+
+    } catch (error) {
+      console.error(error);
+      showMessage("결과 조회 중 오류가 발생했습니다.", "error");
+    }
+  }
+
+  function renderJob(job) {
+    const area = document.getElementById("jobArea");
+
+    const status = job.status || "pending";
+    const progress = typeof job.progress === "number" ? job.progress : getFallbackProgress(status);
+    const strength = job.strength || getPayload().strength;
+    const targetsText = Array.isArray(job.targets) ? job.targets.join(", ") : "-";
+    const currentStep = job.current_step || "-";
+
+    area.className = "";
+    area.innerHTML = `
+      <div class="job-card">
+        <div class="job-header">
+          <div>
+            <div class="job-id">Job: ${escapeHtml(job.job_id || "-")}</div>
+            <div class="job-meta">
+              <div><b>상태:</b> ${renderStatusBadge(status)}</div>
+              <div><b>진행률:</b> ${escapeHtml(progress)}%</div>
+              <div><b>현재 단계:</b> ${escapeHtml(currentStep)}</div>
+              <div><b>스캔 강도:</b> ${escapeHtml(strength)}</div>
+              <div><b>대상:</b> ${escapeHtml(targetsText)}</div>
+              <div><b>시작 시간:</b> ${escapeHtml(formatDateTime(job.started_at))}</div>
+              <div><b>종료 시간:</b> ${escapeHtml(formatDateTime(job.finished_at))}</div>
+              ${job.error ? `<div><b>에러:</b> ${escapeHtml(job.error)}</div>` : ""}
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-bar" style="width: ${progress}%;"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderSteps(steps) {
+    const area = document.getElementById("stepArea");
+
+    if (!steps || steps.length === 0) {
+      area.innerHTML = "";
+      return;
+    }
+
+    area.innerHTML = steps.map(step => {
+      const status = step.status || "waiting";
+      const label = step.label || step.key || "Unknown Step";
+
+      return `
+        <div class="step">
+          <span class="step-name">${escapeHtml(label)}</span>
+          ${renderStatusBadge(status)}
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderResult(result) {
+    const area = document.getElementById("resultArea");
+    area.className = "";
+
+    const summary = result.summary || {
+      critical: 0,
+      high: 0,
+      medium: 0,
+      low: 0,
+      info: 0,
+      unknown: 0
+    };
+
+    const findings = result.findings || [];
+
+    area.innerHTML = `
+      <div class="summary-grid">
+        <div class="summary-card critical">
+          <strong>${summary.critical || 0}</strong>
+          <span>Critical</span>
+        </div>
+        <div class="summary-card high">
+          <strong>${summary.high || 0}</strong>
+          <span>High</span>
+        </div>
+        <div class="summary-card medium">
+          <strong>${summary.medium || 0}</strong>
+          <span>Medium</span>
+        </div>
+        <div class="summary-card low">
+          <strong>${summary.low || 0}</strong>
+          <span>Low</span>
+        </div>
+        <div class="summary-card info">
+          <strong>${summary.info || 0}</strong>
+          <span>Info</span>
+        </div>
+        <div class="summary-card unknown">
+          <strong>${summary.unknown || 0}</strong>
+          <span>Unknown</span>
+        </div>
+      </div>
+
+      <div class="section-title">취약점 목록</div>
+      ${renderFindingsTable(findings)}
+    `;
+  }
+
+  function renderErrorResult(job) {
+    const area = document.getElementById("resultArea");
+    area.className = "empty";
+
+    area.innerHTML = `
+      스캔 중 오류가 발생했습니다.<br>
+      ${job.error ? `오류 내용: ${escapeHtml(job.error)}` : "오류 내용은 백엔드 로그를 확인해주세요."}
+    `;
+  }
+
+  function renderFindingsTable(findings) {
+    if (!findings || findings.length === 0) {
+      return `<div class="empty">JSON 리포트에서 표시할 취약점 목록을 찾지 못했습니다.</div>`;
+    }
+
+    const rows = findings.map(item => {
+      return `
+        <tr>
+          <td>${escapeHtml(item.name || "-")}</td>
+          <td>${escapeHtml(item.severity || "-")}</td>
+          <td>${escapeHtml(item.source || "-")}</td>
+          <td>${escapeHtml(item.owasp_category || "-")}</td>
+          <td>${escapeHtml(item.description || "-")}</td>
+        </tr>
+      `;
+    }).join("");
+
+    return `
+      <table>
+        <thead>
+          <tr>
+            <th>취약점명</th>
+            <th>위험도</th>
+            <th>스캐너</th>
+            <th>OWASP</th>
+            <th>설명</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function renderReports(job) {
+    const area = document.getElementById("reportArea");
+
+    if (!job.reports || job.reports.length === 0) {
+      area.className = "empty";
+
+      if (job.status === "error") {
+        area.innerHTML = `
+          스캔 중 오류가 발생했습니다.<br>
+          생성된 리포트 파일이 없습니다.
+        `;
+      } else {
+        area.innerHTML = "생성된 리포트 파일이 없습니다.";
+      }
+
+      return;
+    }
+
+    area.className = "";
+
+    const reportButtons = job.reports.map(filename => {
+      const label = getReportLabel(filename);
+      const url = `/scan/${job.job_id}/report/${encodeURIComponent(filename)}`;
+
+      return `
+        <a class="report-link" href="${url}" target="_blank">
+          ${label}
+        </a>
+      `;
+    }).join("");
+
+    area.innerHTML = `
+      <div class="result-info">
+        <div><b>Job ID:</b> ${escapeHtml(job.job_id)}</div>
+        <div><b>상태:</b> ${renderStatusBadge(job.status)}</div>
+        <div><b>생성된 리포트 수:</b> ${job.reports.length}개</div>
+      </div>
+
+      <div class="report-grid">
+        ${reportButtons}
+      </div>
+    `;
+  }
+
+  function clearResultAndReports() {
+    const resultArea = document.getElementById("resultArea");
+    const reportArea = document.getElementById("reportArea");
+
+    resultArea.className = "empty";
+    resultArea.innerHTML = "스캔 완료 후 결과 요약이 표시됩니다.";
+
+    reportArea.className = "empty";
+    reportArea.innerHTML = "스캔 완료 후 리포트가 표시됩니다.";
+  }
+
+  function renderStatusBadge(status) {
+    const safeStatus = escapeHtml(status || "pending");
+
+    let className = "pending";
+
+    if (status === "waiting") className = "waiting";
+    if (status === "running") className = "running";
+    if (status === "done") className = "done";
+    if (status === "error") className = "error";
+
+    return `<span class="badge ${className}">${safeStatus}</span>`;
+  }
+
+  function getFallbackProgress(status) {
+    if (status === "pending") return 15;
+    if (status === "running") return 55;
+    if (status === "done") return 100;
+    if (status === "error") return 100;
+    return 0;
+  }
+
+  function getReportLabel(filename) {
+    const lower = filename.toLowerCase();
+
+    if (lower.includes("expert") || lower.includes("report.html")) {
+      return "🔧 전문가 리포트";
+    }
+
+    if (lower.includes("summary") || lower.includes("simple")) {
+      return "📄 간편 리포트";
+    }
+
+    if (lower.endsWith(".json")) {
+      return "📦 JSON";
+    }
+
+    if (lower.includes("verified") && lower.endsWith(".csv")) {
+      return "✅ 확정 CSV";
+    }
+
+    if (lower.includes("unverified") && lower.endsWith(".csv")) {
+      return "⚠️ 미확정 CSV";
+    }
+
+    if (lower.endsWith(".csv")) {
+      return "📊 CSV";
+    }
+
+    if (lower.endsWith(".html")) {
+      return "📄 HTML 리포트";
+    }
+
+    return "📁 " + filename;
+  }
+
+  function showMessage(message, type) {
+    const area = document.getElementById("messageArea");
+
+    area.className = "message";
+
+    if (type) {
+      area.classList.add(type);
+    }
+
+    area.textContent = message || "";
+  }
+
+  function setStartButtonLoading(isLoading) {
+    const button = document.getElementById("startButton");
+    const permissionCheck = document.getElementById("permissionCheck");
+
+    if (isLoading) {
+      button.textContent = "스캔 실행 중...";
+      button.disabled = true;
+    } else {
+      button.textContent = "▶ 스캔 시작";
+      button.disabled = !permissionCheck.checked;
+    }
+  }
+
+  function isValidUrl(value) {
+    return value.startsWith("http://") || value.startsWith("https://");
+  }
+
+  function formatDateTime(value) {
+    if (!value) return "-";
+
+    try {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+
+      return date.toLocaleString();
+    } catch (error) {
+      return value;
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+</script>
+</body>
+</html>
