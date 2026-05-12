@@ -5,7 +5,7 @@ load_dotenv()
 
 # ── ZAP 데몬 연결 설정 ─────────────────────────────────────────
 ZAP_ADDRESS = os.getenv("ZAP_ADDRESS", "127.0.0.1")
-ZAP_PORT    = os.getenv("ZAP_PORT",    "8080")
+ZAP_PORT    = os.getenv("ZAP_PORT",    "8090")
 ZAP_API_KEY = os.getenv("ZAP_API_KEY", "")
 
 # ── 위험도 정렬 기준 ───────────────────────────────────────────

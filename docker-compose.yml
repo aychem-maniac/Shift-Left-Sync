@@ -1,8 +1,4 @@
-version: "3.9"
-
 services:
-
-  # ── OWASP ZAP 데몬 컨테이너 ───────────────────────────────
   zap:
     image: ghcr.io/zaproxy/zaproxy:stable
     container_name: sls_zap
@@ -13,9 +9,8 @@ services:
       -config api.disablekey=true
       -config api.addrs.addr.name=.*
       -config api.addrs.addr.regex=true
-      -config scanner.threadPerHost=5
     ports:
-      - "8080:8080"
+      - "8091:8080"
     networks:
       - sls_net
     restart: unless-stopped
@@ -26,7 +21,6 @@ services:
       retries: 10
       start_period: 40s
 
-  # ── 스캐너 + FastAPI 서버 컨테이너 ────────────────────────
   scanner:
     build:
       context: .
@@ -35,11 +29,11 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - ZAP_ADDRESS=zap     # Docker 내부 네트워크 서비스명
+      - ZAP_ADDRESS=zap
       - ZAP_PORT=8080
-      - ZAP_API_KEY=
+      - ZAP_API_KEY=sls-secret-2026
     volumes:
-      - ./results:/app/results   # 리포트 로컬 저장
+      - ./results:/app/results
     networks:
       - sls_net
     depends_on:
