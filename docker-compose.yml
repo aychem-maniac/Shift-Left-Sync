@@ -1,0 +1,46 @@
+services:
+  zap:
+    image: ghcr.io/zaproxy/zaproxy:stable
+    container_name: sls_zap
+    command: >
+      zap.sh -daemon
+      -host 0.0.0.0
+      -port 8080
+      -config api.disablekey=true
+      -config api.addrs.addr.name=.*
+      -config api.addrs.addr.regex=true
+    ports:
+      - "8091:8080"
+    networks:
+      - sls_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8080/JSON/core/view/version/"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+
+  scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sls_scanner
+    ports:
+      - "8000:8000"
+    environment:
+      - ZAP_ADDRESS=zap
+      - ZAP_PORT=8080
+      - ZAP_API_KEY=sls-secret-2026
+    volumes:
+      - ./results:/app/results
+    networks:
+      - sls_net
+    depends_on:
+      zap:
+        condition: service_healthy
+    restart: unless-stopped
+
+networks:
+  sls_net:
+    driver: bridge

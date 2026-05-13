@@ -1,0 +1,11 @@
+﻿=== Nmap Port Results ===
+host,port,protocol,service,state,product,version
+No port results
+
+=== Security Findings ===
+source,name,severity,confidence,url,description
+header_scan,Missing Security Header: Content-Security-Policy,Medium,High,http://211.227.98.120:8080,Content-Security-Policy header is not set.
+header_scan,Missing Security Header: X-Frame-Options,Medium,High,http://211.227.98.120:8080,X-Frame-Options header is not set.
+header_scan,Missing Security Header: Strict-Transport-Security,Medium,High,http://211.227.98.120:8080,Strict-Transport-Security header is not set.
+header_scan,Missing Security Header: X-Content-Type-Options,Medium,High,http://211.227.98.120:8080,X-Content-Type-Options header is not set.
+sqlmap,SQL Injection Not Detected,Info,Medium,http://211.227.98.120:8080,SQLMap did not detect SQL Injection with the current scan options.
