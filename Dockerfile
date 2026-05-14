@@ -6,6 +6,12 @@ RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     perl \
+    libnet-ssleay-perl \
+    libio-socket-ssl-perl \
+    liburi-perl \
+    libwww-perl \
+    libjson-perl \
+    libxml-writer-perl \
     git \
     && rm -rf /var/lib/apt/lists/*
 

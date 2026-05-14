@@ -184,10 +184,17 @@ def dispatch(vuln: dict) -> dict:
         status, detail = verify_cors(url)
 
     else:
+        # 매핑 안 된 항목: HTTP 응답코드라도 확인
+        try:
+            r = requests.get(url, timeout=5, verify=False, allow_redirects=True)
+            base_detail = f"HTTP {r.status_code} 확인 — 수동 검토 필요"
+        except Exception as e:
+            base_detail = f"연결 실패: {e}"
+
         if vuln.get("risk") == "High":
-            status, detail = "CONFIRMED", "High 위험도 자동 승인 (수동 검토 권장)"
+            status, detail = "CONFIRMED", f"High 위험도 ({base_detail})",
         else:
-            status, detail = "UNVERIFIED", "자동 검증 루틴 미매핑 — 수동 검토 필요"
+            status, detail = "UNVERIFIED", base_detail
 
     vuln["poc_status"] = status
     vuln["evidence"]   = detail

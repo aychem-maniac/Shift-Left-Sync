@@ -10,3 +10,4 @@ requests
 python-dotenv
 urllib3
 sqlmap
+python-multipart

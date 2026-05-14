@@ -34,6 +34,7 @@ services:
       - ZAP_API_KEY=sls-secret-2026
     volumes:
       - ./results:/app/results
+      - ./data:/app/data
     networks:
       - sls_net
     depends_on:
