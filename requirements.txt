@@ -10,4 +10,8 @@ requests
 python-dotenv
 urllib3
 sqlmap
+
+httpx
+jinja2
+aiofiles
 python-multipart

@@ -53,6 +53,16 @@ def init_db():
                 finished_at TEXT,
                 created_at  TEXT    NOT NULL DEFAULT (datetime('now','localtime'))
             );
+            CREATE TABLE IF NOT EXISTS verify_tokens (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                job_id      TEXT    NOT NULL UNIQUE REFERENCES scan_jobs(job_id) ON DELETE CASCADE,
+                token       TEXT    NOT NULL,
+                target      TEXT    NOT NULL,
+                status      TEXT    NOT NULL DEFAULT 'pending',
+                method      TEXT,
+                created_at  TEXT    NOT NULL DEFAULT (datetime('now','localtime')),
+                verified_at TEXT
+            );
             CREATE TABLE IF NOT EXISTS reports (
                 id               INTEGER PRIMARY KEY AUTOINCREMENT,
                 job_id           TEXT    NOT NULL REFERENCES scan_jobs(job_id) ON DELETE CASCADE,
@@ -101,7 +111,9 @@ def get_user_by_id(user_id):
 
 def get_all_users():
     with get_conn() as conn:
-        rows = conn.execute("SELECT * FROM users ORDER BY created_at DESC").fetchall()
+        rows = conn.execute(
+            "SELECT * FROM users WHERE status != 'rejected' ORDER BY created_at DESC"
+        ).fetchall()
         return [dict(r) for r in rows]
 
 def update_user_status(user_id, status, approved_by=None):
@@ -117,6 +129,11 @@ def update_user_status(user_id, status, approved_by=None):
 def update_user_role(user_id, role):
     with get_conn() as conn:
         conn.execute("UPDATE users SET role=? WHERE id=?", (role, user_id))
+
+def delete_user(user_id):
+    with get_conn() as conn:
+        # 세션, 스캔잡, 리포트는 CASCADE로 자동 삭제
+        conn.execute("DELETE FROM users WHERE id=?", (user_id,))
 
 def create_session(user_id):
     token = secrets.token_hex(32)
@@ -207,3 +224,26 @@ def get_job_reports(job_id):
             "SELECT * FROM reports WHERE job_id=? ORDER BY id", (job_id,)
         ).fetchall()
         return [dict(r) for r in rows]
+
+
+# ── 소유권 인증 ──────────────────────────────────────────────
+def create_verify_token(job_id, token, target):
+    with get_conn() as conn:
+        conn.execute(
+            "INSERT OR REPLACE INTO verify_tokens (job_id,token,target) VALUES (?,?,?)",
+            (job_id, token, target)
+        )
+
+def get_verify_token(job_id):
+    with get_conn() as conn:
+        row = conn.execute(
+            "SELECT * FROM verify_tokens WHERE job_id=?", (job_id,)
+        ).fetchone()
+        return dict(row) if row else None
+
+def update_verify_status(job_id, status, method=None):
+    with get_conn() as conn:
+        conn.execute(
+            "UPDATE verify_tokens SET status=?, method=?, verified_at=datetime('now','localtime') WHERE job_id=?",
+            (status, method, job_id)
+        )
