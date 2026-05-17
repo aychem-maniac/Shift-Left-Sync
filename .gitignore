@@ -9,3 +9,14 @@ sls_scanner/scanners/1.env
 *.csv
 *.json
 *.html
+results/reports/*.json
+
+results/reports/*.csv
+
+results/reports/*.html
+
+__pycache__/
+
+*.db
+
+data/sls.db
