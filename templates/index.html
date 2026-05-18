@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shift-Left-Sync</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+<div class="page">
+    <header class="header">
+        <a href="/" class="logo-area" style="text-decoration:none;">
+            <div class="header-icon">🛡️</div>
+            <div class="header-title">Shift-Left-Sync</div>
+        </a>
+
+        <nav class="header-menu">
+            <a href="/features">기능 소개</a>
+            <a href="/reports">리포트</a>
+            <a href="/guide">사용법</a>
+            <a href="/" class="header-login-button active">Login</a>
+        </nav>
+    </header>
+
+    <section class="hero-section">
+        <div class="badge">Security Scanner Platform</div>
+        <h1 class="hero-title">URL 하나로 시작하는<br>자동화 웹 취약점 분석</h1>
+        <p class="hero-subtitle">
+            Nmap, ZAP, SQLMap, Header Scanner를 통합하여 취약점을 탐지하고<br>
+            사용자별 스캔 기록과 리포트를 한 곳에서 관리합니다.
+        </p>
+    </section>
+
+    <main class="main-section">
+        <section class="feature-panel">
+            <div class="feature-card">
+                <div class="feature-top">
+                    <div class="feature-icon">🔎</div>
+                    <h3 class="feature-title">Integrated Scan Pipeline</h3>
+                </div>
+                <p class="feature-text">
+                    여러 보안 도구를 하나의 스캔 흐름으로 통합하여 URL 입력만으로 자동 분석을 실행합니다.
+                </p>
+                <div class="stack-row">
+                    <span class="stack-badge">Nmap</span>
+                    <span class="stack-badge">ZAP</span>
+                    <span class="stack-badge">SQLMap</span>
+                    <span class="stack-badge">Header</span>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-top">
+                    <div class="feature-icon">⚠️</div>
+                    <h3 class="feature-title">Risk Evaluation</h3>
+                </div>
+                <p class="feature-text">
+                    탐지 결과를 severity, risk score, OWASP Top 10 기준으로 분류하여 위험도를 확인합니다.
+                </p>
+                <div class="stack-row">
+                    <span class="stack-badge">Severity</span>
+                    <span class="stack-badge">Risk Score</span>
+                    <span class="stack-badge">OWASP Top 10</span>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-top">
+                    <div class="feature-icon">📄</div>
+                    <h3 class="feature-title">Report Export</h3>
+                </div>
+                <p class="feature-text">
+                    스캔 결과를 HTML, CSV, JSON 리포트로 생성하여 발표, 검토, 기록 관리에 활용할 수 있습니다.
+                </p>
+                <div class="stack-row">
+                    <span class="stack-badge">HTML</span>
+                    <span class="stack-badge">CSV</span>
+                    <span class="stack-badge">JSON</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="auth-card">
+            <h2 class="auth-title">계정 로그인</h2>
+            <p class="auth-desc">스캔 기록과 리포트를 저장하려면 로그인하세요.</p>
+
+            {% if msg %}
+                {% if '완료' in msg %}
+                    <div class="info-box">{{ msg }}</div>
+                {% elif '대기' in msg %}
+                    <div class="pending-box">{{ msg }}</div>
+                {% else %}
+                    <div class="error-box">{{ msg }}</div>
+                {% endif %}
+            {% endif %}
+
+            <div class="tabs">
+                <button id="tab-login" class="tab-button active" onclick="showTab('login')">로그인</button>
+                <button id="tab-reg" class="tab-button" onclick="showTab('reg')">회원가입</button>
+            </div>
+            <script>
+            // URL에 tab=reg 파라미터가 있으면 회원가입 탭 자동 전환
+            (function() {
+                var params = new URLSearchParams(window.location.search);
+                if (params.get('tab') === 'reg') {
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showTab('reg');
+                    });
+                }
+            })();
+            </script>
+
+            <div id="pane-login" class="tab-pane active">
+                <form method="post" action="/auth/login">
+                    <div class="form-group">
+                        <label class="form-label">아이디</label>
+                        <input type="text" name="username" class="form-input" placeholder="아이디를 입력하세요" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">비밀번호</label>
+                        <input type="password" name="password" class="form-input" placeholder="비밀번호를 입력하세요" required>
+                    </div>
+
+                    <button type="submit" class="submit-button">로그인</button>
+                </form>
+            </div>
+
+            <div id="pane-reg" class="tab-pane">
+                <form method="post" action="/auth/register" id="reg-form">
+                    <div class="form-group">
+                        <label class="form-label">아이디</label>
+                        <input type="text" name="username" class="form-input" placeholder="아이디를 입력하세요" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">이메일</label>
+                        <input type="email" name="email" class="form-input" placeholder="이메일을 입력하세요" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">비밀번호</label>
+                        <input type="password" name="password" class="form-input" placeholder="비밀번호를 입력하세요" required>
+                    </div>
+
+                    <button type="submit" class="submit-button">회원가입 신청</button>
+
+                    <div class="signup-guide">
+                        ※ 회원가입 후 관리자 승인이 필요합니다.
+                    </div>
+                </form>
+            </div>
+
+            <div class="notice">
+                Authorized testing only. 허가된 대상에 대해서만 스캔을 수행하세요.
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <span>© 2026 Shift-Left-Sync Team</span>
+        <span>Automated Web Vulnerability Scanner</span>
+    </footer>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

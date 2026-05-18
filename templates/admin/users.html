@@ -1,0 +1,76 @@
+{% extends "admin/layout.html" %}
+{% block title %}유저 관리 - Shift-Left-Sync{% endblock %}
+{% block admin_content %}
+<section class="table-panel">
+  <div class="section-header">
+    <h2>유저 관리</h2>
+    <p style="font-size:12px;color:#888;margin-top:4px">
+      승인 대기 및 승인된 유저만 표시됩니다. 거절/삭제된 유저는 자동으로 제거됩니다.
+    </p>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>아이디</th>
+          <th>이메일</th>
+          <th>권한</th>
+          <th>상태</th>
+          <th>가입일</th>
+          <th>승인일</th>
+          <th>관리</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if users %}
+          {% for user in users %}
+          <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.role }}</td>
+            <td><span class="status-badge {{ status_class(user.status) }}">{{ status_label(user.status) }}</span></td>
+            <td>{{ fmt_datetime(user.created_at) }}</td>
+            <td>{{ fmt_datetime(user.approved_at) }}</td>
+            <td>
+              {% if user.id != current_user.id %}
+              <div class="action-buttons">
+                {# 권한 변경 #}
+                {% if user.role == "admin" %}
+                <form method="post" action="/admin/users/{{ user.id }}/role?role=user">
+                  <button class="btn btn-change-role" type="submit">user로 변경</button>
+                </form>
+                {% else %}
+                <form method="post" action="/admin/users/{{ user.id }}/role?role=admin">
+                  <button class="btn btn-change-role" type="submit">admin으로 변경</button>
+                </form>
+                {% endif %}
+
+                {# 승인/삭제 #}
+                {% if user.status == "pending" %}
+                <form method="post" action="/admin/users/{{ user.id }}/approve">
+                  <button class="btn btn-approve" type="submit">승인</button>
+                </form>
+                {% endif %}
+
+                {# 삭제 버튼 (자기 자신 제외) #}
+                <form method="post" action="/admin/users/{{ user.id }}/delete"
+                      onsubmit="return confirm('{{ user.username }} 유저를 삭제하시겠습니까?\n관련 스캔 기록도 함께 삭제됩니다.')">
+                  <button class="btn btn-reject" type="submit">삭제</button>
+                </form>
+              </div>
+              {% else %}
+                <span class="muted">현재 로그인 계정</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="8" class="empty-state">표시할 유저가 없습니다.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends "admin/layout.html" %}
+{% block title %}스캔 이력 - Shift-Left-Sync{% endblock %}
+{% block admin_content %}
+
+<style>
+.scan-filter-bar { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; align-items:center; }
+.filter-btn { background:#1a1f2e; border:1px solid #2d3561; color:#888; padding:5px 14px;
+  border-radius:6px; cursor:pointer; font-size:12px; }
+.filter-btn.active { background:#1565c0; color:white; border-color:#1565c0; }
+.search-input { background:#0f1117; border:1px solid #2d3561; color:#e0e0e0;
+  padding:6px 12px; border-radius:6px; font-size:12px; width:200px; outline:none; }
+.search-input:focus { border-color:#64b5f6; }
+.scan-card { background:#1a1f2e; border:1px solid #2d3561; border-radius:10px;
+  padding:14px 18px; margin-bottom:10px; transition:.2s; }
+.scan-card:hover { border-color:#3d4571; }
+.scan-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.scan-meta { font-size:11px; color:#666; margin-bottom:6px; }
+.progress-wrap { background:#0f1117; border-radius:4px; height:6px; margin:6px 0; overflow:hidden; }
+.progress-bar { height:100%; border-radius:4px; transition:width .5s;
+  background:linear-gradient(90deg,#1565c0,#64b5f6); }
+.phase-text { font-size:11px; color:#64b5f6; margin-bottom:6px; }
+.report-links { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+.report-link { font-size:11px; background:#1a3a5c; color:#64b5f6; padding:3px 8px;
+  border-radius:4px; text-decoration:none; }
+.report-link:hover { background:#1976d2; color:white; }
+.badge { display:inline-block; font-size:11px; font-weight:bold;
+  padding:2px 9px; border-radius:10px; }
+.badge-running { background:#1a3a5c; color:#64b5f6; }
+.badge-queued { background:#2a2a1a; color:#ffd54f; }
+.badge-done { background:#1a3a2a; color:#66bb6a; }
+.badge-error { background:#3a1a1a; color:#ef5350; }
+.badge-pending { background:#2d2d2d; color:#aaa; }
+.live-dot { display:inline-block; width:7px; height:7px; border-radius:50%;
+  background:#64b5f6; margin-right:5px; animation:pulse 1.2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+.empty-state { color:#555; text-align:center; padding:40px 0; font-size:14px; }
+.scan-count { font-size:12px; color:#666; }
+</style>
+
+<div class="section-header" style="margin-bottom:16px">
+  <h2>📊 스캔 이력 <span class="scan-count" id="scan-count"></span></h2>
+</div>
+
+<div class="scan-filter-bar">
+  <button class="filter-btn active" onclick="setFilter('all', this)">전체</button>
+  <button class="filter-btn" onclick="setFilter('running', this)">진행 중</button>
+  <button class="filter-btn" onclick="setFilter('queued', this)">대기</button>
+  <button class="filter-btn" onclick="setFilter('done', this)">완료</button>
+  <button class="filter-btn" onclick="setFilter('error', this)">오류</button>
+  <input class="search-input" id="searchInput" type="text"
+         placeholder="유저·타겟 검색" oninput="renderCards()">
+</div>
+
+<div id="scan-list"></div>
+
+<script>
+var ALL_JOBS  = {{ jobs_json | safe }};
+var pollMap   = {};
+var curFilter = 'all';
+
+function labelOf(f) {
+  if (f.indexOf('simple') >= 0)         return '📄 간편';
+  if (f.indexOf('report.html') >= 0)    return '🔧 전문가';
+  if (f.indexOf('full.json') >= 0)      return '📦 JSON';
+  if (f.indexOf('confirmed') >= 0)      return '✅ 확정';
+  if (f.indexOf('unverified') >= 0)     return '⚠️ 수동검토';
+  if (f.indexOf('full.csv') >= 0)       return '📊 전체CSV';
+  return '📄';
+}
+
+function badgeHtml(status) {
+  var cls = 'badge-' + status;
+  var labels = { running:'진행 중', queued:'대기', done:'완료',
+                 error:'오류', pending_verify:'인증 대기', pending:'대기' };
+  var live = (status === 'running')
+    ? '<span class="live-dot"></span>' : '';
+  return '<span class="badge ' + cls + '">' + live + (labels[status] || status) + '</span>';
+}
+
+function reportLinks(reports, jobId) {
+  if (!reports || !reports.length) return '';
+  return reports.map(function(r) {
+    var isHtml = r.filename.indexOf('.html') >= 0;
+    var href   = isHtml ? '/view/' + r.filename : '/report/' + r.filename;
+    return '<a class="report-link" href="' + href + '">' + labelOf(r.filename) + '</a>';
+  }).join('');
+}
+
+function cardHtml(j) {
+  var pct      = j.progress || 0;
+  var isActive = j.status === 'running' || j.status === 'queued';
+  var progress = isActive
+    ? '<div class="progress-wrap"><div class="progress-bar" id="pb-' + j.job_id +
+      '" style="width:' + pct + '%"></div></div>'
+      + '<div class="phase-text" id="ph-' + j.job_id + '">' + (j.phase || '') + '</div>'
+    : (j.phase ? '<div style="font-size:11px;color:#555;margin:4px 0">' + j.phase + '</div>' : '');
+  var rlinks = reportLinks(j.reports, j.job_id);
+  return (
+    '<div class="scan-card" id="card-' + j.job_id + '">'
+    + '<div class="scan-card-header">'
+    + '<span style="font-family:monospace;font-size:12px;color:#64b5f6">Job: ' + j.job_id + '</span>'
+    + badgeHtml(j.status)
+    + '</div>'
+    + '<div class="scan-meta">'
+    + '👤 ' + (j.username || '?') + ' &nbsp;|&nbsp; 🎯 ' + j.target
+    + ' &nbsp;|&nbsp; 강도: ' + (j.strength || '-')
+    + ' &nbsp;|&nbsp; 🕐 ' + ((j.created_at || '').slice(0, 16))
+    + (j.finished_at ? ' &nbsp;|&nbsp; ✅ ' + j.finished_at.slice(0, 16) : '')
+    + '</div>'
+    + progress
+    + (rlinks ? '<div class="report-links">' + rlinks + '</div>' : '')
+    + '</div>'
+  );
+}
+
+function filtered() {
+  var q = (document.getElementById('searchInput').value || '').toLowerCase();
+  return ALL_JOBS.filter(function(j) {
+    if (curFilter !== 'all' && j.status !== curFilter) return false;
+    if (q && (j.target||'').toLowerCase().indexOf(q) < 0
+           && (j.username||'').toLowerCase().indexOf(q) < 0
+           && (j.job_id||'').toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  });
+}
+
+function renderCards() {
+  var jobs = filtered();
+  document.getElementById('scan-count').textContent = '(' + jobs.length + '건)';
+  if (!jobs.length) {
+    document.getElementById('scan-list').innerHTML =
+      '<div class="empty-state">표시할 스캔 기록이 없습니다.</div>';
+    return;
+  }
+  document.getElementById('scan-list').innerHTML = jobs.map(cardHtml).join('');
+  jobs.forEach(function(j) {
+    if ((j.status === 'running' || j.status === 'queued') && !pollMap[j.job_id]) {
+      startPoll(j.job_id);
+    }
+  });
+}
+
+function setFilter(f, btn) {
+  curFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  renderCards();
+}
+
+async function startPoll(job_id) {
+  if (pollMap[job_id]) return;
+  pollMap[job_id] = setInterval(async function() {
+    var res = await fetch('/api/scan/' + job_id);
+    if (!res.ok) return;
+    var j = await res.json();
+    // ALL_JOBS 업데이트
+    for (var i = 0; i < ALL_JOBS.length; i++) {
+      if (ALL_JOBS[i].job_id === job_id) { ALL_JOBS[i] = j; break; }
+    }
+    // 카드 갱신
+    var card = document.getElementById('card-' + job_id);
+    if (card) card.outerHTML = cardHtml(j);
+
+    if (j.status === 'done' || j.status === 'error') {
+      clearInterval(pollMap[job_id]);
+      delete pollMap[job_id];
+    }
+  }, 4000);
+}
+
+renderCards();
+</script>
+
+{% endblock %}

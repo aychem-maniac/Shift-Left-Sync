@@ -1,1 +1,0 @@
-http://scanme.nmap.org/search/?q=YJHl (GET)  # C:\Users\user\AppData\Local\Programs\Python\Python311\Scripts\sqlmap -u http://scanme.nmap.org --batch --level=1 --risk=1 --crawl=1 --forms --smart --output-dir results/sqlmap
