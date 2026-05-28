@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Shift-Left-Sync Admin{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/app.css') }}">
+</head>
+
+<body>
+  <div class="admin-shell">
+    <header class="admin-header">
+      <div class="brand-row">
+        <div class="brand-icon">🛡️</div>
+        <div class="brand-title">Shift-Left-Sync</div>
+        <span class="admin-badge">ADMIN</span>
+      </div>
+
+      <nav class="admin-nav" aria-label="관리자 메뉴">
+        <a class="{{ 'active' if active_menu == 'home' else '' }}" href="/admin">Home</a>
+        <a class="{{ 'active' if active_menu == 'pending' else '' }}" href="/admin/pending">승인 대기</a>
+        <a class="{{ 'active' if active_menu == 'users' else '' }}" href="/admin/users">유저 관리</a>
+        <a class="{{ 'active' if active_menu == 'history' else '' }}" href="/admin/history">히스토리</a>
+        <a href="/dashboard">스캔 화면</a>
+        <a class="logout" href="/auth/logout">로그아웃</a>
+      </nav>
+    </header>
+
+    <section class="admin-hero">
+      <div>
+        <div class="admin-kicker">Admin Control Center</div>
+        <h1 class="admin-title">사용자와 스캔 현황을<br>한눈에 관리합니다</h1>
+        <p class="admin-desc">
+          승인 대기 계정, 전체 스캔 작업, 진행률, 리포트 상태를<br>
+          관리자 화면에서 통합적으로 확인할 수 있습니다.
+        </p>
+      </div>
+
+      <aside class="admin-profile-card">
+        <span>관리자 계정</span>
+        <strong>{{ current_user.username }}</strong>
+        <span>권한</span>
+        <strong>{{ current_user.role }}</strong>
+      </aside>
+    </section>
+
+    <main class="admin-main">
+      {% block admin_content %}{% endblock %}
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', path='/js/admin.js') }}"></script>
+</body>
+</html>
