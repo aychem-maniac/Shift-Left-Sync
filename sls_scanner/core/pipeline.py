@@ -34,12 +34,7 @@ class ScanCancelledError(Exception):
     pass
 
 
-from sls_scanner.scanners.nmap_scanner    import run_nmap_scan
-from sls_scanner.scanners.zap_scanner     import run_zap_scan
-from sls_scanner.scanners.sqlmap_scanner  import run_sqlmap_scan
-from sls_scanner.scanners.header_scanner  import run_header_scan
-from sls_scanner.scanners.nikto_scanner   import NiktoScanner
-from sls_scanner.scanners.nuclei_scanner  import NucleiScanner
+from sls_scanner.scanners.registry import run_scanner
 
 from sls_scanner.normalizers.normalizer import (
     normalize_zap, normalize_nmap, normalize_sqlmap,
@@ -88,15 +83,15 @@ def run_pipeline(target: str, strength: str = "medium") -> None:
     scan_start = time.time()
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as ex:
-        f_nmap   = ex.submit(run_nmap_scan,   target)
-        f_sqlmap = ex.submit(run_sqlmap_scan,  target)
-        f_header = ex.submit(run_header_scan,  target)
-        f_nikto  = ex.submit(lambda: NiktoScanner(target=target, strength=strength).run())
-        f_nuclei = ex.submit(lambda: NucleiScanner(target=target, strength=strength).run())
+        f_nmap   = ex.submit(run_scanner, "nmap", target, strength)
+        f_sqlmap = ex.submit(run_scanner, "sqlmap", target, strength)
+        f_header = ex.submit(run_scanner, "header", target, strength)
+        f_nikto  = ex.submit(run_scanner, "nikto", target, strength)
+        f_nuclei = ex.submit(run_scanner, "nuclei", target, strength)
 
         # ZAP 직렬화 (단일 데몬 충돌 방지)
         with _zap_lock:
-            raw_zap = run_zap_scan(target, strength=strength, progress_cb=None)
+            raw_zap = run_scanner("zap", target, strength=strength, progress_cb=None)
 
         raw_nmap   = f_nmap.result()
         raw_sqlmap = f_sqlmap.result()
@@ -250,7 +245,7 @@ def run_pipeline_with_cb(
                     if _cancel_flags.get(job_id):
                         raise ScanCancelledError("ZAP 중 사용자 취소")
                 raw_zap.update(
-                    run_zap_scan(target, strength=strength, progress_cb=_zap_pcb)
+                    run_scanner("zap", target, strength=strength, progress_cb=_zap_pcb)
                 )
             else:
                 _safe_cb(f"ZAP 대기 타임아웃 ({zap_timeout//60}분) — ZAP 없이 진행", 43)
@@ -269,11 +264,11 @@ def run_pipeline_with_cb(
     # non-ZAP 스레드풀: 즉시 병렬 실행
     _safe_cb("Nmap / SQLMap / Header / Nikto / Nuclei 시작", 5)
     NON_ZAP = [
-        ("Nmap",   lambda: run_nmap_scan(target)),
-        ("SQLMap", lambda: run_sqlmap_scan(target)),
-        ("Header", lambda: run_header_scan(target)),
-        ("Nikto",  lambda: NiktoScanner(target=target, strength=strength).run()),
-        ("Nuclei", lambda: NucleiScanner(target=target, strength=strength).run()),
+        ("Nmap",   lambda: run_scanner("nmap", target, strength=strength)),
+        ("SQLMap", lambda: run_scanner("sqlmap", target, strength=strength)),
+        ("Header", lambda: run_scanner("header", target, strength=strength)),
+        ("Nikto",  lambda: run_scanner("nikto", target, strength=strength)),
+        ("Nuclei", lambda: run_scanner("nuclei", target, strength=strength)),
     ]
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as ex:
         futs = {name: ex.submit(fn) for name, fn in NON_ZAP}

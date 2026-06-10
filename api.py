@@ -10,6 +10,12 @@ import json
 import asyncio
 from datetime import datetime
 
+from sls_scanner.services.scanner_service import (
+    run_scan_job,
+    cancel_scan_job,
+    ScanCancelledError,
+)
+
 # ── SSE / 취소 전역 상태 ─────────────────────────────────────────
 _job_sse_queues: dict[str, asyncio.Queue] = {}   # job_id → SSE Queue
 _main_loop: asyncio.AbstractEventLoop | None = None
@@ -1348,9 +1354,8 @@ async def api_cancel_scan(job_id: str, request: Request):
     if status in ("done", "error", "cancelled"):
         return {"cancelled": False, "message": f"이미 종료된 잡입니다 (상태: {status})"}
 
-    # 파이프라인에 취소 신호 전달
-    from sls_scanner.core.pipeline import request_cancel as _pipeline_cancel
-    _pipeline_cancel(job_id)
+    # 스캔 서비스에 취소 신호 전달
+    cancel_scan_job(job_id)
     update_job(job_id, phase="취소 요청됨 — 현재 단계 완료 후 중단")
 
     return {"cancelled": True, "message": "취소 요청을 전달했습니다. 현재 단계 완료 후 중단됩니다."}
@@ -1536,12 +1541,14 @@ async def _run_scan(job_id: str, target: str, strength: str):
     _push_sse_for_job(job_id, {"type": "progress", "phase": "스캔 시작", "progress": 0})
 
     try:
-        from sls_scanner.core.pipeline import run_pipeline_with_cb, ScanCancelledError
         try:
             await asyncio.get_running_loop().run_in_executor(
                 None,
-                lambda: run_pipeline_with_cb(
-                    target=target, strength=strength, cb=cb, job_id=job_id
+                lambda: run_scan_job(
+                    job_id=job_id,
+                    target=target,
+                    strength=strength,
+                    progress_cb=cb,
                 )
             )
         except ScanCancelledError as ce:
