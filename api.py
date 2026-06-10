@@ -1583,3 +1583,179 @@ async def _run_scan(job_id: str, target: str, strength: str):
         finished_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     )
     _push_sse_for_job(job_id, {"type": "done", "phase": "완료", "progress": 100})
+
+# ═══════════════════════════════════════════════════════════
+# IDS / IPS Middleware - SLS 서비스 자체 보호
+# ═══════════════════════════════════════════════════════════
+from starlette.responses import JSONResponse as _IDSJSONResponse
+from sls_scanner.ids.detector import (
+    detect_http_request as _ids_detect_http_request,
+    highest_severity as _ids_highest_severity,
+    should_block as _ids_should_block,
+)
+
+IDS_IPS_MODE = os.getenv("IPS_MODE", "false").lower() in ("1", "true", "yes", "on")
+IDS_EVENT_LIMIT = int(os.getenv("IDS_EVENT_LIMIT", "1000"))
+_ids_events: collections.deque = collections.deque(maxlen=IDS_EVENT_LIMIT)
+
+
+def _ids_client_ip(request) -> str:
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    if request.client:
+        return request.client.host
+    return "unknown"
+
+
+def _ids_event_to_dict(
+    *,
+    request,
+    finding,
+    action: str,
+    highest: str,
+) -> dict:
+    return {
+        "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "ip": _ids_client_ip(request),
+        "method": request.method,
+        "path": request.url.path,
+        "query": str(request.url.query),
+        "attack_type": finding.attack_type,
+        "rule_name": finding.rule_name,
+        "severity": finding.severity,
+        "highest_severity": highest,
+        "matched_field": finding.matched_field,
+        "matched_value": finding.matched_value,
+        "description": finding.description,
+        "action": action,
+        "user_agent": request.headers.get("user-agent", ""),
+    }
+
+
+@app.middleware("http")
+async def ids_ips_middleware(request, call_next):
+    """
+    SLS 서비스 보호용 Web IDS/IPS middleware.
+
+    - 기본 IDS 모드: 공격 의심 요청을 탐지하고 로그만 저장
+    - IPS_MODE=true: high 이상 위험 요청은 403으로 차단
+    """
+    path = request.url.path
+
+    # 정적 파일과 favicon은 과도한 로그 방지를 위해 제외
+    if path.startswith("/static") or path == "/favicon.ico":
+        return await call_next(request)
+
+    body_text = ""
+    raw_body = b""
+
+    # POST/PUT/PATCH 요청 body 일부만 검사.
+    # body를 읽은 뒤 downstream handler가 다시 읽을 수 있도록 receive를 복구한다.
+    if request.method in ("POST", "PUT", "PATCH"):
+        try:
+            raw_body = await request.body()
+            content_type = request.headers.get("content-type", "")
+
+            if raw_body and (
+                "application/json" in content_type
+                or "application/x-www-form-urlencoded" in content_type
+                or "text/plain" in content_type
+                or "multipart/form-data" in content_type
+            ):
+                body_text = raw_body[:4096].decode("utf-8", errors="replace")
+
+            async def _receive():
+                return {"type": "http.request", "body": raw_body, "more_body": False}
+
+            request._receive = _receive
+        except Exception:
+            body_text = ""
+
+    findings = _ids_detect_http_request(
+        method=request.method,
+        path=request.url.path,
+        query=str(request.url.query),
+        headers=request.headers,
+        body=body_text,
+    )
+
+    if findings:
+        highest = _ids_highest_severity(findings)
+        blocked = IDS_IPS_MODE and _ids_should_block(findings, min_severity="high")
+        action = "blocked" if blocked else "detected"
+
+        for finding in findings:
+            _ids_events.appendleft(
+                _ids_event_to_dict(
+                    request=request,
+                    finding=finding,
+                    action=action,
+                    highest=highest,
+                )
+            )
+
+        # 기존 봇 차단 로직과 연계: high 이상이면 strike 누적
+        if highest in ("high", "critical"):
+            ip = _ids_client_ip(request)
+            _ip_strike[ip] = _ip_strike.get(ip, 0) + 1
+
+        if blocked:
+            return _IDSJSONResponse(
+                status_code=403,
+                content={
+                    "detail": "Blocked by SLS IDS/IPS",
+                    "mode": "IPS",
+                    "highest_severity": highest,
+                    "detections": [f.to_dict() for f in findings],
+                },
+            )
+
+    return await call_next(request)
+
+
+@app.get("/api/ids/events")
+async def api_ids_events(request: Request, limit: int = 100):
+    """
+    최근 IDS 탐지 이벤트 조회.
+    관리자만 접근 가능.
+    """
+    u = _current_user(request)
+    if not u or u.get("role") != "admin":
+        raise HTTPException(status_code=403)
+
+    safe_limit = max(1, min(limit, 500))
+    return {
+        "ips_mode": IDS_IPS_MODE,
+        "count": len(_ids_events),
+        "events": list(_ids_events)[:safe_limit],
+    }
+
+
+@app.get("/api/ids/summary")
+async def api_ids_summary(request: Request):
+    """
+    IDS 탐지 이벤트 요약.
+    관리자만 접근 가능.
+    """
+    u = _current_user(request)
+    if not u or u.get("role") != "admin":
+        raise HTTPException(status_code=403)
+
+    by_type: dict[str, int] = {}
+    by_severity: dict[str, int] = {}
+    by_action: dict[str, int] = {}
+
+    for event in _ids_events:
+        by_type[event["attack_type"]] = by_type.get(event["attack_type"], 0) + 1
+        by_severity[event["severity"]] = by_severity.get(event["severity"], 0) + 1
+        by_action[event["action"]] = by_action.get(event["action"], 0) + 1
+
+    return {
+        "ips_mode": IDS_IPS_MODE,
+        "total": len(_ids_events),
+        "by_type": by_type,
+        "by_severity": by_severity,
+        "by_action": by_action,
+    }
+
