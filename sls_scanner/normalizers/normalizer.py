@@ -6,6 +6,11 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from typing import List
 from config import OWASP_MAP, RISK_ORDER
+from sls_scanner.normalizers.filters import (
+    NIKTO_EXCLUDED_PREFIXES,
+    NUCLEI_EXCLUDED_NAMES,
+    ZAP_EXCLUDED_NAMES,
+)
 
 
 @dataclass
@@ -38,22 +43,25 @@ def map_owasp(name: str) -> str:
     for kw, cat in OWASP_MAP.items():
         if kw in nl:
             return cat
-    return "A05:2021 - Security Misconfiguration"
+    return "A02:2025 - Security Misconfiguration"
 
 
 # ── ZAP ───────────────────────────────────────────────────────
 def normalize_zap(raw: list) -> List[Vuln]:
     results, seen = [], set()
     for a in raw:
+        name = a.get('alert', '')
+        if name in ZAP_EXCLUDED_NAMES:
+            continue
         path = re.sub(r'https?://[^/]+', '', a.get('url', ''))
-        key  = (a.get('alert', ''), path, a.get('param', ''))
+        key  = (name, path, a.get('param', ''))
         if key in seen:
             continue
         seen.add(key)
         results.append(Vuln(
             tool        = "OWASP ZAP",
             vuln_id     = f"ZAP-{a.get('alertRef', '0')}",
-            name        = a.get('alert', ''),
+            name        = name,
             risk        = a.get('risk', 'Low'),
             url         = a.get('url', ''),
             param       = a.get('param', ''),
@@ -91,7 +99,7 @@ def normalize_nmap(raw: dict) -> List[Vuln]:
                     description = f"Port {port}/{protocol} is open. Service: {service} {product} {version}",
                     solution    = "포트 노출 여부 검토 및 불필요한 서비스 비활성화",
                     cwe         = "CWE-0",
-                    owasp       = "A05:2021 - Security Misconfiguration",
+                    owasp       = "A02:2025 - Security Misconfiguration",
                 ))
     return results
 
@@ -120,7 +128,7 @@ def normalize_sqlmap(raw: dict) -> List[Vuln]:
         description = "SQLMap으로 SQL Injection 점검한 결과입니다.",
         solution    = "파라미터화된 쿼리 및 입력값 검증 적용",
         cwe         = "CWE-89",
-        owasp       = "A03:2021 - Injection",
+        owasp       = "A05:2025 - Injection",
     )
     v.poc_status = poc
     results.append(v)
@@ -156,7 +164,7 @@ def normalize_header(raw: dict) -> List[Vuln]:
             description = f"{header} 헤더가 응답에 없습니다.",
             solution    = f"웹 서버 또는 애플리케이션에서 {header} 헤더를 설정하세요.",
             cwe         = "CWE-693",
-            owasp       = "A05:2021 - Security Misconfiguration",
+            owasp       = "A02:2025 - Security Misconfiguration",
         ))
     return results
 
@@ -166,6 +174,8 @@ def normalize_nikto(raw: list) -> List[Vuln]:
     results, seen = [], set()
     for item in raw:
         msg = item.get('msg', '')
+        if msg.startswith(NIKTO_EXCLUDED_PREFIXES):
+            continue
         key = (msg, item.get('uri', ''))
         if key in seen:
             continue
@@ -228,6 +238,8 @@ def normalize_nuclei(raw: list) -> List[Vuln]:
         matched  = item.get('matched-at', '')
         name     = info.get('name', template)
         desc     = info.get('description', '')
+        if name in NUCLEI_EXCLUDED_NAMES:
+            continue
         key      = (template, matched)
         if key in seen:
             continue

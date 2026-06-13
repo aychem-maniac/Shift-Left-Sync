@@ -2,9 +2,12 @@
 # 변경: evidence 덮어쓰기 제거 → poc_reason 필드로 분리
 #       각 검증 함수에 상세 근거(페이로드·응답 스니펫·헤더값) 포함
 
+from __future__ import annotations
+
 import re
 import time
 import requests
+from sls_scanner.verifiers.payload_loader import load_payloads
 requests.packages.urllib3.disable_warnings()
 
 TIMEOUT = 10
@@ -29,18 +32,24 @@ def _snippet(text: str, keyword: str, window: int = 60) -> str:
     return text[start:end].replace("\n", " ").strip()
 
 
+def _vuln_text(vuln: dict) -> str:
+    """취약점 이름, 근거, 설명을 함께 묶어 매칭 정확도를 높인다."""
+    return " ".join(
+        str(vuln.get(k, "") or "")
+        for k in ("name", "evidence", "description")
+    ).lower()
+
+
 # ── XSS ──────────────────────────────────────────────────────────
 def verify_xss(url: str, param: str) -> tuple:
     if not param:
         return "UNVERIFIED", "파라미터 정보 없음 — 수동 확인 필요"
 
     CANARY = "ShiftLeftXSS_8472"
-    payloads = [
-        f"<{CANARY}>",
-        f"<script>alert('{CANARY}')</script>",
-        f"'\"><img src=x onerror=alert('{CANARY}')>",
-        f"javascript:alert('{CANARY}')",
-    ]
+    payloads = load_payloads("xss", canary=CANARY)
+    if not payloads:
+        return "UNVERIFIED", "XSS payload 파일을 읽지 못함 — 수동 확인 필요"
+
     try:
         for pl in payloads:
             r = requests.get(url, params={param: pl},
@@ -53,19 +62,11 @@ def verify_xss(url: str, param: str) -> tuple:
                     f"파라미터: {param} | 페이로드: {pl[:60]} | "
                     f"응답 스니펫: ...{snip}..."
                 )
-        # 모두 인코딩됨 — 인코딩 형태 확인
-        r_last = requests.get(url, params={param: f"<{CANARY}>"},
-                              timeout=TIMEOUT, verify=False)
-        encoded_form = ""
-        for enc in [f"&lt;{CANARY}&gt;", f"%3C{CANARY}%3E",
-                    CANARY.lower(), CANARY]:
-            if enc in r_last.text:
-                encoded_form = enc
-                break
+
         reason = (
-            f"모든 페이로드 인코딩 처리됨 — 오탐으로 판단 | "
+            f"모든 XSS payload에서 canary 미반사 — 오탐으로 판단 | "
             f"파라미터: {param} | "
-            f"인코딩 확인값: {encoded_form or '응답에 canary 없음(필터링)'}"
+            f"검사 payload 수: {len(payloads)} | canary: {CANARY}"
         )
         return "FALSE_POSITIVE", reason
     except Exception as e:
@@ -89,63 +90,100 @@ def verify_sqli(url: str, param: str) -> tuple:
     ]
     try:
         # 1단계: 에러 기반
-        r = requests.get(url, params={param: "'"},
-                         timeout=TIMEOUT, verify=False)
-        for err in SQL_ERRORS:
-            if err in r.text.lower():
-                snip = _snippet(r.text, err)
-                return (
-                    "CONFIRMED",
-                    f"SQL 에러 메시지 노출 | "
-                    f"파라미터: {param} | 페이로드: ' (단일 따옴표) | "
-                    f"에러 키워드: '{err}' | 응답 스니펫: ...{snip}..."
-                )
+        error_payloads = load_payloads("sqli_error")
+        if not error_payloads:
+            return "UNVERIFIED", "SQLi error payload 파일을 읽지 못함 — 수동 확인 필요"
 
-        # 2단계: 응답 길이 차이 (Boolean 기반)
-        r_true  = requests.get(url, params={param: "1' OR '1'='1"},
-                               timeout=TIMEOUT, verify=False)
-        r_false = requests.get(url, params={param: "1' AND '1'='2"},
-                               timeout=TIMEOUT, verify=False)
-        len_diff = abs(len(r_true.text) - len(r_false.text))
-        if len_diff > 200:
-            return (
-                "CONFIRMED",
-                f"Boolean 기반 SQLi 의심 | "
-                f"파라미터: {param} | "
-                f"TRUE 응답: {len(r_true.text)}bytes / FALSE 응답: {len(r_false.text)}bytes | "
-                f"차이: {len_diff}bytes"
-            )
+        for pl in error_payloads:
+            r = requests.get(url, params={param: pl},
+                             timeout=TIMEOUT, verify=False)
+            body_lower = r.text.lower()
+            for err in SQL_ERRORS:
+                if err in body_lower:
+                    snip = _snippet(r.text, err)
+                    return (
+                        "CONFIRMED",
+                        f"SQL 에러 메시지 노출 | "
+                        f"파라미터: {param} | 페이로드: {pl[:80]} | "
+                        f"에러 키워드: '{err}' | 응답 스니펫: ...{snip}..."
+                    )
+
+        # 2단계: baseline 응답시간 측정
+        baseline_samples = []
+        for _ in range(2):
+            t0 = time.time()
+            requests.get(url, params={param: "1"},
+                         timeout=TIMEOUT, verify=False)
+            baseline_samples.append(time.time() - t0)
+        baseline = sum(baseline_samples) / max(len(baseline_samples), 1)
 
         # 3단계: 시간 기반 블라인드
-        t0 = time.time()
-        requests.get(url, params={param: "1' AND SLEEP(4)-- -"},
-                     timeout=12, verify=False)
-        elapsed = time.time() - t0
-        if elapsed >= 3.8:
+        time_payloads = load_payloads("sqli_time")
+        if not time_payloads:
             return (
-                "CONFIRMED",
-                f"시간 기반 SQLi 확인 | "
-                f"파라미터: {param} | 페이로드: SLEEP(4) | "
-                f"응답 지연: {elapsed:.1f}s (정상: < 1s)"
+                "UNVERIFIED",
+                f"SQL 에러 증거 없음, sqli_time payload 파일 읽기 실패 | "
+                f"파라미터: {param} | baseline: {baseline:.2f}s"
+            )
+
+        threshold = max(baseline + 3.0, baseline * 3, 4.0)
+        slowest_payload = ""
+        slowest_elapsed = 0.0
+        for pl in time_payloads:
+            t0 = time.time()
+            try:
+                requests.get(url, params={param: pl},
+                             timeout=12, verify=False)
+            except requests.Timeout:
+                elapsed = time.time() - t0
+                return (
+                    "CONFIRMED",
+                    f"시간 기반 SQLi 확인 | "
+                    f"파라미터: {param} | 페이로드: {pl[:80]} | "
+                    f"baseline: {baseline:.2f}s | 요청 타임아웃: {elapsed:.2f}s"
+                )
+            elapsed = time.time() - t0
+            if elapsed > slowest_elapsed:
+                slowest_payload = pl
+                slowest_elapsed = elapsed
+            if elapsed >= threshold:
+                return (
+                    "CONFIRMED",
+                    f"시간 기반 SQLi 확인 | "
+                    f"파라미터: {param} | 페이로드: {pl[:80]} | "
+                    f"baseline: {baseline:.2f}s | 응답 지연: {elapsed:.2f}s | "
+                    f"기준: {threshold:.2f}s"
+                )
+
+        if slowest_elapsed >= baseline + 2.0:
+            return (
+                "UNVERIFIED",
+                f"SQLi 시간 지연이 애매함 — 수동 확인 필요 | "
+                f"파라미터: {param} | baseline: {baseline:.2f}s | "
+                f"최대 지연: {slowest_elapsed:.2f}s | 페이로드: {slowest_payload[:80]}"
             )
 
         return (
             "FALSE_POSITIVE",
-            f"에러 없음 / Boolean 차이 없음({len_diff}bytes) / 지연 없음({elapsed:.1f}s) | "
-            f"파라미터: {param} — 오탐으로 판단"
+            f"SQL 에러 문자열 없음 / 유의미한 지연 없음 — 오탐으로 판단 | "
+            f"파라미터: {param} | error payload 수: {len(error_payloads)} | "
+            f"time payload 수: {len(time_payloads)} | baseline: {baseline:.2f}s | "
+            f"최대 지연: {slowest_elapsed:.2f}s"
         )
     except requests.Timeout:
-        return (
-            "CONFIRMED",
-            f"타임아웃 발생 → 블라인드 SQLi 강하게 의심 | "
-            f"파라미터: {param} | SLEEP 페이로드에서 서버 응답 없음"
-        )
+        return "UNVERIFIED", f"요청 타임아웃 — 지연 기반 SQLi 여부 수동 확인 필요 | 파라미터: {param}"
     except Exception as e:
         return "UNVERIFIED", f"요청 실패: {e}"
 
 
 # ── 보안 헤더 누락 ────────────────────────────────────────────────
 def verify_header(url: str, header_name: str) -> tuple:
+    if not header_name:
+        return (
+            "UNVERIFIED",
+            "특정 헤더명이 없는 보안 헤더 누락 탐지 — 자동 확정하지 않음"
+        )
+
     try:
         r = requests.get(url, timeout=TIMEOUT, verify=False,
                          allow_redirects=True)
@@ -269,59 +307,49 @@ def verify_private_ip(url: str) -> tuple:
 # ── CORS 설정 오류 ────────────────────────────────────────────────
 def verify_cors(url: str) -> tuple:
     try:
-        # 1단계: 단순 GET Origin 반사 확인
-        r = requests.get(
-            url, timeout=TIMEOUT, verify=False,
-            headers={"Origin": "https://evil.com"}
-        )
-        acao = r.headers.get("Access-Control-Allow-Origin", "")
-        acac = r.headers.get("Access-Control-Allow-Credentials", "")
+        origins = load_payloads("cors")
+        if not origins:
+            return "UNVERIFIED", "CORS Origin payload 파일을 읽지 못함 — 수동 확인 필요"
 
-        if acao == "*":
-            return (
-                "CONFIRMED",
-                f"CORS 와일드카드 허용 (ACAO: *) | "
-                f"모든 출처에서 리소스 접근 가능 | HTTP {r.status_code}"
-            )
-        if "evil.com" in acao:
-            cred_risk = " + Credentials=true → 인증 정보 탈취 가능" if acac.lower() == "true" else ""
-            return (
-                "CONFIRMED",
-                f"임의 Origin 반사 확인 | "
-                f"ACAO: {acao}{cred_risk} | HTTP {r.status_code}"
-            )
-        if acao and acac.lower() == "true":
-            return (
-                "CONFIRMED",
-                f"ACAO+Credentials 위험 조합 | "
-                f"ACAO: {acao} / ACAC: {acac} | HTTP {r.status_code}"
-            )
-
-        # 2단계: Preflight 확인
-        try:
-            preflight = requests.options(
+        last_acao = ""
+        last_acac = ""
+        for origin in origins:
+            r = requests.get(
                 url, timeout=TIMEOUT, verify=False,
-                headers={
-                    "Origin": "https://evil.com",
-                    "Access-Control-Request-Method": "POST",
-                }
+                headers={"Origin": origin}
             )
-            acam = preflight.headers.get("Access-Control-Allow-Methods", "")
-            acao_pre = preflight.headers.get("Access-Control-Allow-Origin", "")
-            if "evil.com" in acao_pre:
+            acao = r.headers.get("Access-Control-Allow-Origin", "")
+            acac = r.headers.get("Access-Control-Allow-Credentials", "")
+            last_acao = acao
+            last_acac = acac
+
+            if acao == "*":
+                cred_risk = " / ACAC=true는 브라우저에서 제한되지만 서버 정책은 위험" if acac.lower() == "true" else ""
                 return (
                     "CONFIRMED",
-                    f"Preflight에서 임의 Origin 허용 | "
-                    f"ACAO: {acao_pre} / 허용 메서드: {acam} | HTTP {preflight.status_code}"
+                    f"CORS 와일드카드 허용 (ACAO: *) | "
+                    f"요청 Origin: {origin}{cred_risk} | HTTP {r.status_code}"
                 )
-        except Exception:
-            pass
+            if acao == origin:
+                cred_risk = " + Credentials=true → 인증 정보 탈취 가능" if acac.lower() == "true" else ""
+                return (
+                    "CONFIRMED",
+                    f"임의 Origin 반사 확인 | "
+                    f"요청 Origin: {origin} | ACAO: {acao}{cred_risk} | HTTP {r.status_code}"
+                )
+            if acao and acac.lower() == "true" and (acao == "*" or acao == origin or origin in acao):
+                return (
+                    "CONFIRMED",
+                    f"ACAO+Credentials 위험 조합 | "
+                    f"요청 Origin: {origin} | ACAO: {acao} / ACAC: {acac} | HTTP {r.status_code}"
+                )
 
         return (
             "FALSE_POSITIVE",
             f"CORS 정상 설정 — 오탐으로 판단 | "
-            f"ACAO: '{acao or '없음'}' / ACAC: '{acac or '없음'}' | "
-            f"evil.com Origin 반사 없음"
+            f"검사 Origin 수: {len(origins)} | "
+            f"마지막 ACAO: '{last_acao or '없음'}' / ACAC: '{last_acac or '없음'}' | "
+            f"Origin 반사 없음"
         )
     except Exception as e:
         return "UNVERIFIED", f"요청 실패: {e}"
@@ -390,52 +418,58 @@ def verify_directory_listing(url: str) -> tuple:
 
 
 # ── 메인 디스패처 ─────────────────────────────────────────────────
-def dispatch(vuln: dict) -> dict:
+def dispatch(vuln: dict, strength: str = "medium") -> dict:
     """
     PoC 검증 수행 후 poc_status / poc_reason 설정.
     원본 evidence는 덮어쓰지 않음.
     """
-    name  = vuln.get("name", "").lower()
+    text  = _vuln_text(vuln)
     url   = vuln.get("url", "")
     param = vuln.get("param", "")
 
-    if any(k in name for k in ["xss", "cross site script", "reflected"]):
+    if any(k in text for k in ["xss", "cross site script", "reflected"]):
         status, reason = verify_xss(url, param)
 
-    elif any(k in name for k in ["sql injection", "sqli"]):
+    elif any(k in text for k in ["sql injection", "sqli"]):
         status, reason = verify_sqli(url, param)
 
-    elif "x-frame-options" in name or "anti-clickjacking" in name:
+    elif "x-frame-options" in text or "anti-clickjacking" in text:
         status, reason = verify_header(url, "X-Frame-Options")
 
-    elif "content security policy" in name or "csp" in name:
+    elif "content security policy" in text or "content-security-policy" in text or "csp" in text:
         status, reason = verify_header(url, "Content-Security-Policy")
 
-    elif "strict-transport" in name or "hsts" in name:
+    elif "strict-transport" in text or "strict transport" in text or "hsts" in text:
         status, reason = verify_header(url, "Strict-Transport-Security")
 
-    elif "x-content-type" in name:
+    elif "x-content-type" in text:
         status, reason = verify_header(url, "X-Content-Type-Options")
 
-    elif "referrer" in name:
+    elif "referrer" in text:
         status, reason = verify_header(url, "Referrer-Policy")
 
-    elif "cookie" in name:
+    elif "permissions-policy" in text or "permissions policy" in text:
+        status, reason = verify_header(url, "Permissions-Policy")
+
+    elif "missing security headers" in text or "missing security header" in text:
+        status, reason = verify_header(url, "")
+
+    elif "cookie" in text:
         status, reason = verify_cookie(url)
 
-    elif "session id in url" in name or "session token in url" in name:
+    elif "session id in url" in text or "session token in url" in text:
         status, reason = verify_session_in_url(url)
 
-    elif "private ip" in name or "internal ip" in name:
+    elif "private ip" in text or "internal ip" in text:
         status, reason = verify_private_ip(url)
 
-    elif "cross-domain" in name or "cors" in name:
+    elif "cross-domain" in text or "cors" in text:
         status, reason = verify_cors(url)
 
-    elif "open redirect" in name or "redirect" in name:
+    elif "open redirect" in text or "redirect" in text:
         status, reason = verify_open_redirect(url, param)
 
-    elif "directory" in name and ("listing" in name or "browsing" in name):
+    elif "directory" in text and ("listing" in text or "browsing" in text):
         status, reason = verify_directory_listing(url)
 
     else:
