@@ -1,0 +1,12 @@
+# Source reference:
+# https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/CORS%20Misconfiguration
+# PayloadsAllTheThings keeps CORS guidance in README.md, not as a dedicated
+# intruder payload file. These Origin probes are derived from the README's
+# misconfiguration patterns: wildcard ACAO, arbitrary Origin reflection,
+# null Origin trust, subdomain/suffix validation mistakes, and HTTP origin trust.
+https://evil.com
+null
+https://example.com.evil.com
+http://evil.com
+https://sub.evil.com
+
