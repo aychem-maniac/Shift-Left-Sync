@@ -36,6 +36,9 @@ services:
       - ZAP_API_KEY=sls-secret-2026
       - MAX_CONCURRENT_SCANS=3   # 동시 스캔 수 (ZAP 메모리 감안해 조정)
       - IPS_MODE=true           # false=탐지만 수행, true=high 이상 요청 차단
+      - SOAR_ENABLED=true
+      - SOAR_AUTO_BLACKLIST=true
+      - SOAR_STRIKE_THRESHOLD=3
     volumes:
       - ./results:/app/results
       - ./data:/app/data

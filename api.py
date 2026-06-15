@@ -1598,6 +1598,13 @@ IDS_IPS_MODE = os.getenv("IPS_MODE", "false").lower() in ("1", "true", "yes", "o
 IDS_EVENT_LIMIT = int(os.getenv("IDS_EVENT_LIMIT", "1000"))
 _ids_events: collections.deque = collections.deque(maxlen=IDS_EVENT_LIMIT)
 
+# ── Mini SOAR 설정 ─────────────────────────────────────────────
+SOAR_ENABLED = os.getenv("SOAR_ENABLED", "false").lower() in ("1", "true", "yes", "on")
+SOAR_AUTO_BLACKLIST = os.getenv("SOAR_AUTO_BLACKLIST", "false").lower() in ("1", "true", "yes", "on")
+SOAR_STRIKE_THRESHOLD = int(os.getenv("SOAR_STRIKE_THRESHOLD", "3"))
+SOAR_EVENT_LIMIT = int(os.getenv("SOAR_EVENT_LIMIT", "1000"))
+
+_soar_events: collections.deque = collections.deque(maxlen=SOAR_EVENT_LIMIT)
 
 def _ids_client_ip(request) -> str:
     forwarded = request.headers.get("x-forwarded-for")
@@ -1632,7 +1639,62 @@ def _ids_event_to_dict(
         "user_agent": request.headers.get("user-agent", ""),
     }
 
+def _soar_add_event(*, request: Request, event_type: str, action: str, reason: str, severity: str, extra: dict | None = None):
+    ip = _ids_client_ip(request)
 
+    event = {
+        "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "ip": ip,
+        "method": request.method,
+        "path": request.url.path,
+        "query": str(request.url.query),
+        "event_type": event_type,
+        "action": action,
+        "reason": reason,
+        "severity": severity,
+        "extra": extra or {},
+    }
+
+    _soar_events.appendleft(event)
+    return event
+
+
+def _soar_handle_ids_detection(request: Request, findings: list, highest: str):
+    """
+    IDS 탐지 결과를 기반으로 SOAR 이벤트를 기록합니다.
+
+    현재 SOAR는 strike/blacklist를 직접 수정하지 않고,
+    IDS/IPS 탐지 이후의 대응 이력만 기록합니다.
+
+    blacklist/strike 관리는 기존 bot_blacklist_middleware 쪽에서 담당합니다.
+    """
+    if not SOAR_ENABLED:
+        return []
+
+    if highest not in ("high", "critical"):
+        return []
+
+    attack_types = sorted({f.attack_type for f in findings})
+    rule_names = sorted({f.rule_name for f in findings})
+
+    actions = []
+
+    actions.append(
+        _soar_add_event(
+            request=request,
+            event_type="ids_high_risk_detected",
+            action="response_logged",
+            reason=f"High-risk IDS detection logged: {', '.join(attack_types)}",
+            severity=highest,
+            extra={
+                "attack_types": attack_types,
+                "rule_names": rule_names,
+                "note": "SOAR does not modify strike or blacklist directly.",
+            },
+        )
+    )
+
+    return actions
 @app.middleware("http")
 async def ids_ips_middleware(request, call_next):
     """
@@ -1695,10 +1757,10 @@ async def ids_ips_middleware(request, call_next):
                 )
             )
 
-        # 기존 봇 차단 로직과 연계: high 이상이면 strike 누적
-        if highest in ("high", "critical"):
-            ip = _ids_client_ip(request)
-            _ip_strike[ip] = _ip_strike.get(ip, 0) + 1
+        # IDS 탐지 결과를 기반으로 Mini SOAR 이벤트 기록
+        # - high/critical 탐지 시 대응 로그만 저장
+        # - strike/blacklist 관리는 기존 bot_blacklist_middleware에서 담당
+        _soar_handle_ids_detection(request, findings, highest)
 
         if blocked:
             return _IDSJSONResponse(
@@ -1757,5 +1819,58 @@ async def api_ids_summary(request: Request):
         "by_type": by_type,
         "by_severity": by_severity,
         "by_action": by_action,
+    }
+
+
+@app.get("/api/soar/events")
+async def api_soar_events(request: Request, limit: int = 100):
+    """
+    최근 Mini SOAR 대응 이벤트 조회.
+    관리자만 접근 가능.
+    """
+    u = _current_user(request)
+    if not u or u.get("role") != "admin":
+        raise HTTPException(status_code=403)
+
+    safe_limit = max(1, min(limit, 500))
+
+    return {
+        "soar_enabled": SOAR_ENABLED,
+        "auto_blacklist": SOAR_AUTO_BLACKLIST,
+        "strike_threshold": SOAR_STRIKE_THRESHOLD,
+        "count": len(_soar_events),
+        "events": list(_soar_events)[:safe_limit],
+    }
+
+
+@app.get("/api/soar/summary")
+async def api_soar_summary(request: Request):
+    """
+    Mini SOAR 대응 이벤트 요약.
+    관리자만 접근 가능.
+    """
+    u = _current_user(request)
+    if not u or u.get("role") != "admin":
+        raise HTTPException(status_code=403)
+
+    by_action: dict[str, int] = {}
+    by_event_type: dict[str, int] = {}
+    by_severity: dict[str, int] = {}
+
+    for event in _soar_events:
+        by_action[event["action"]] = by_action.get(event["action"], 0) + 1
+        by_event_type[event["event_type"]] = by_event_type.get(event["event_type"], 0) + 1
+        by_severity[event["severity"]] = by_severity.get(event["severity"], 0) + 1
+
+    return {
+        "soar_enabled": SOAR_ENABLED,
+        "auto_blacklist": SOAR_AUTO_BLACKLIST,
+        "strike_threshold": SOAR_STRIKE_THRESHOLD,
+        "total": len(_soar_events),
+        "by_action": by_action,
+        "by_event_type": by_event_type,
+        "by_severity": by_severity,
+        "current_strikes": dict(_ip_strike),
+        "blacklist_count": len(_ip_blacklist),
     }
 
