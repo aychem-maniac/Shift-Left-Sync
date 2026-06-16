@@ -5,7 +5,9 @@ __pycache__/
 .env
 results/reports/
 results/sqlmap/
+logs/
 sls_scanner/scanners/1.env
 *.csv
 *.json
 *.html
+!templates/**/*.html

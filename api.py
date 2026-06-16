@@ -137,7 +137,10 @@ from database import (
     update_verify_status,
     get_verified_target,
     upsert_verified_target,
+    get_security_events,
+    get_security_event_stats,
 )
+from waf_audit_parser import ingest_waf_audit_log
 app = FastAPI(title="Shift-Left-Sync")
 
 # static/style.css, static/app.js 연결
@@ -1069,6 +1072,38 @@ async def admin_history(request: Request):
     )
 
 
+@app.get("/admin/security", response_class=HTMLResponse)
+async def admin_security(
+    request: Request,
+    source: str = Query("", max_length=32),
+    severity: str = Query("", max_length=32),
+    action: str = Query("", max_length=32),
+):
+    u = _require_admin(request)
+    if not u:
+        return RedirectResponse("/")
+
+    ingest_result = ingest_waf_audit_log()
+    events = get_security_events(
+        source=source or None,
+        severity=severity or None,
+        action=action or None,
+        limit=100,
+    )
+    stats = get_security_event_stats()
+
+    return _admin_template(
+        request,
+        "admin/security.html",
+        "security",
+        u,
+        events=events,
+        stats=stats,
+        filters={"source": source, "severity": severity, "action": action},
+        ingest_result=ingest_result,
+    )
+
+
 @app.post("/admin/users/{user_id}/approve")
 async def approve_user(user_id: int, request: Request):
     u = _current_user(request)
@@ -1337,6 +1372,39 @@ async def api_remove_blacklist(ip: str, request: Request):
     removed = _ip_blacklist.pop(ip, None)
     _ip_strike.pop(ip, None)
     return {"unblocked": True, "ip": ip, "was_blocked": removed is not None}
+
+
+@app.get("/api/security/events")
+async def api_security_events(
+    request: Request,
+    source: str = Query("", max_length=32),
+    severity: str = Query("", max_length=32),
+    action: str = Query("", max_length=32),
+    limit: int = Query(100, ge=1, le=500),
+):
+    u = _require_admin(request)
+    if not u:
+        raise HTTPException(403, "admin only")
+
+    ingest_waf_audit_log()
+    return {
+        "items": get_security_events(
+            source=source or None,
+            severity=severity or None,
+            action=action or None,
+            limit=limit,
+        )
+    }
+
+
+@app.get("/api/security/stats")
+async def api_security_stats(request: Request):
+    u = _require_admin(request)
+    if not u:
+        raise HTTPException(403, "admin only")
+
+    ingest_waf_audit_log()
+    return get_security_event_stats()
 
 
 @app.post("/api/scan/{job_id}/cancel")

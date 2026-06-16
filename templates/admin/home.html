@@ -1,0 +1,74 @@
+{% extends "admin/layout.html" %}
+{% block title %}관리자 홈 - Shift-Left-Sync{% endblock %}
+{% block admin_content %}
+<section class="stats-grid">
+  {% for stat in stats %}
+  <article class="stat-card">
+    <p>{{ stat.title }}</p>
+    <strong>{{ stat.value }}</strong>
+  </article>
+  {% endfor %}
+</section>
+
+{% if pending_users %}
+<div class="notice">승인 대기 계정 {{ pending_users|length }}개가 있습니다.</div>
+{% endif %}
+
+<section class="table-panel">
+  <div class="section-header">
+    <h2>최근 스캔 이력</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>요청 시간</th>
+          <th>요청자</th>
+          <th>대상 URL</th>
+          <th>강도</th>
+          <th>상태</th>
+          <th>진행</th>
+          <th>단계</th>
+          <th>리포트</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if recent_scans %}
+          {% for scan in recent_scans %}
+          <tr>
+            <td>{{ fmt_datetime(scan.created_at) }}</td>
+            <td>{{ scan.username }}</td>
+            <td class="url-cell">{{ scan.target }}</td>
+            <td>{{ scan.strength }}</td>
+            <td><span class="status-badge {{ status_class(scan.status) }}">{{ status_label(scan.status) }}</span></td>
+            <td>
+              <div class="progress-cell">
+                <div class="progress-bar"><span style="width: {{ scan.progress }}%"></span></div>
+                <span>{{ scan.progress }}%</span>
+              </div>
+            </td>
+            <td>{{ scan.phase }}</td>
+            <td>
+              {% if scan.reports %}
+              <div class="report-list">
+                {% for report in scan.reports %}
+                <a class="report-card" href="/report/{{ report.filename }}?job={{ scan.job_id }}" target="_blank" rel="noreferrer">
+                  <strong>{{ report_type_label(report.report_type) }}</strong>
+                  <span>전체 {{ report.total_count }} / 확정 {{ report.confirmed_count }} / 미확정 {{ report.unverified_count }}</span>
+                </a>
+                {% endfor %}
+              </div>
+              {% else %}
+                <span class="muted">리포트 없음</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="8" class="empty-state">표시할 스캔 기록이 없습니다.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

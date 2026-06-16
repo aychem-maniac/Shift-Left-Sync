@@ -1,0 +1,104 @@
+{% extends "admin/layout.html" %}
+{% block title %}보안 이벤트 - Shift-Left-Sync{% endblock %}
+{% block admin_content %}
+<section class="stats-grid">
+  <article class="stat-card">
+    <p>전체 이벤트</p>
+    <strong>{{ stats.total }}</strong>
+  </article>
+  <article class="stat-card">
+    <p>High/Critical</p>
+    <strong>{{ stats.high_critical }}</strong>
+  </article>
+  <article class="stat-card">
+    <p>WAF 탐지</p>
+    <strong>{{ stats.waf_detect }}</strong>
+  </article>
+  <article class="stat-card">
+    <p>WAF 차단</p>
+    <strong>{{ stats.waf_block }}</strong>
+  </article>
+  <article class="stat-card">
+    <p>이번 동기화</p>
+    <strong>{{ ingest_result.ingested }}</strong>
+  </article>
+</section>
+
+<form class="filter-bar" method="get" action="/admin/security">
+  <label>
+    Source
+    <select name="source">
+      <option value="" {{ 'selected' if not filters.source else '' }}>전체</option>
+      {% for value in ['waf', 'soar', 'app'] %}
+      <option value="{{ value }}" {{ 'selected' if filters.source == value else '' }}>{{ value }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>
+    Severity
+    <select name="severity">
+      <option value="" {{ 'selected' if not filters.severity else '' }}>전체</option>
+      {% for value in ['critical', 'high', 'medium', 'low'] %}
+      <option value="{{ value }}" {{ 'selected' if filters.severity == value else '' }}>{{ value }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>
+    Action
+    <select name="action">
+      <option value="" {{ 'selected' if not filters.action else '' }}>전체</option>
+      {% for value in ['detect', 'block', 'respond'] %}
+      <option value="{{ value }}" {{ 'selected' if filters.action == value else '' }}>{{ value }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <button class="btn btn-change-role" type="submit">필터 적용</button>
+  <a class="btn btn-reset" href="/admin/security">초기화</a>
+</form>
+
+<div class="notice">WAF는 DetectionOnly 기준으로 시작하므로 대부분 action=detect로 기록됩니다. high/critical 이벤트는 SOAR 대응 로그를 별도로 남깁니다.</div>
+
+<section class="table-panel">
+  <div class="section-header">
+    <h2>최근 보안 이벤트 100건</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>시간</th>
+          <th>Source</th>
+          <th>Type</th>
+          <th>Severity</th>
+          <th>Action</th>
+          <th>IP</th>
+          <th>Method</th>
+          <th>Path</th>
+          <th>Rule</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if events %}
+          {% for event in events %}
+          <tr>
+            <td>{{ fmt_datetime(event.created_at) }}</td>
+            <td>{{ event.source }}</td>
+            <td>{{ event.event_type }}</td>
+            <td><span class="status-badge severity-{{ event.severity }}">{{ event.severity }}</span></td>
+            <td><span class="status-badge action-{{ event.action }}">{{ event.action }}</span></td>
+            <td>{{ event.ip or '-' }}</td>
+            <td>{{ event.method or '-' }}</td>
+            <td class="url-cell">{{ event.path or '-' }}</td>
+            <td>{{ event.rule_id or '-' }}</td>
+            <td class="reason-cell">{{ event.reason or '-' }}</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="10" class="empty-state">표시할 보안 이벤트가 없습니다.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

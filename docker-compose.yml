@@ -28,8 +28,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: sls_scanner
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     environment:
       - ZAP_ADDRESS=zap
       - ZAP_PORT=8080
@@ -43,6 +43,29 @@ services:
     depends_on:
       zap:
         condition: service_healthy
+    restart: unless-stopped
+
+  waf:
+    image: owasp/modsecurity-crs:nginx
+    container_name: sls_waf
+    ports:
+      - "8088:8080"
+    environment:
+      - SERVER_NAME=localhost
+      - PORT=8080
+      - BACKEND=http://scanner:8000
+      - MODSEC_RULE_ENGINE=DetectionOnly
+      - MODSEC_AUDIT_ENGINE=On
+      - MODSEC_AUDIT_LOG=/var/log/modsecurity/audit.log
+      - MODSEC_AUDIT_LOG_FORMAT=JSON
+      - MODSEC_AUDIT_LOG_TYPE=Serial
+      - PROXY_TIMEOUT=300s
+    volumes:
+      - ./logs/waf:/var/log/modsecurity
+    networks:
+      - sls_net
+    depends_on:
+      - scanner
     restart: unless-stopped
 
 networks:

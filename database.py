@@ -82,6 +82,27 @@ def init_db():
                 verified_at TEXT    NOT NULL DEFAULT (datetime('now','localtime')),
                 expires_at  TEXT    NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS security_events (
+                id             INTEGER PRIMARY KEY AUTOINCREMENT,
+                source         TEXT    NOT NULL DEFAULT 'waf',
+                event_type     TEXT    NOT NULL DEFAULT 'rule_match',
+                severity       TEXT    NOT NULL DEFAULT 'low',
+                action         TEXT    NOT NULL DEFAULT 'detect',
+                ip             TEXT,
+                method         TEXT,
+                path           TEXT,
+                payload_sample TEXT,
+                reason         TEXT,
+                rule_id        TEXT,
+                status_code    INTEGER,
+                event_id       TEXT UNIQUE,
+                raw_json       TEXT,
+                created_at     TEXT    NOT NULL DEFAULT (datetime('now','localtime'))
+            );
+            CREATE INDEX IF NOT EXISTS idx_security_events_created
+                ON security_events(created_at);
+            CREATE INDEX IF NOT EXISTS idx_security_events_filters
+                ON security_events(source, severity, action);
         """)
         conn.execute(
             "INSERT OR IGNORE INTO users (username,email,password_hash,role,status) VALUES (?,?,?,?,?)",
@@ -231,6 +252,112 @@ def get_job_reports(job_id):
             "SELECT * FROM reports WHERE job_id=? ORDER BY id", (job_id,)
         ).fetchall()
         return [dict(r) for r in rows]
+
+
+def log_security_event(
+    source="waf",
+    event_type="rule_match",
+    severity="low",
+    action="detect",
+    ip=None,
+    method=None,
+    path=None,
+    payload_sample=None,
+    reason=None,
+    rule_id=None,
+    status_code=None,
+    event_id=None,
+    raw_json=None,
+):
+    with get_conn() as conn:
+        cur = conn.execute(
+            """
+            INSERT OR IGNORE INTO security_events
+            (source,event_type,severity,action,ip,method,path,payload_sample,
+             reason,rule_id,status_code,event_id,raw_json)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+            """,
+            (
+                source,
+                event_type,
+                severity,
+                action,
+                ip,
+                method,
+                path,
+                payload_sample,
+                reason,
+                rule_id,
+                status_code,
+                event_id,
+                raw_json,
+            ),
+        )
+        return cur.rowcount > 0
+
+
+def get_security_events(source=None, severity=None, action=None, limit=100):
+    where = []
+    params = []
+    if source:
+        where.append("source=?")
+        params.append(source)
+    if severity:
+        where.append("severity=?")
+        params.append(severity)
+    if action:
+        where.append("action=?")
+        params.append(action)
+
+    sql = "SELECT * FROM security_events"
+    if where:
+        sql += " WHERE " + " AND ".join(where)
+    sql += " ORDER BY created_at DESC, id DESC LIMIT ?"
+    params.append(limit)
+
+    with get_conn() as conn:
+        rows = conn.execute(sql, params).fetchall()
+        return [dict(r) for r in rows]
+
+
+def get_security_event_stats():
+    def grouped(conn, field):
+        rows = conn.execute(
+            f"SELECT {field} AS name, COUNT(*) AS count FROM security_events GROUP BY {field}"
+        ).fetchall()
+        return {r["name"]: r["count"] for r in rows}
+
+    with get_conn() as conn:
+        total = conn.execute("SELECT COUNT(*) AS count FROM security_events").fetchone()["count"]
+        high_critical = conn.execute(
+            "SELECT COUNT(*) AS count FROM security_events WHERE severity IN ('high','critical')"
+        ).fetchone()["count"]
+        return {
+            "total": total,
+            "high_critical": high_critical,
+            "by_source": grouped(conn, "source"),
+            "by_severity": grouped(conn, "severity"),
+            "by_action": grouped(conn, "action"),
+            "waf_detect": conn.execute(
+                "SELECT COUNT(*) AS count FROM security_events WHERE source='waf' AND action='detect'"
+            ).fetchone()["count"],
+            "waf_block": conn.execute(
+                "SELECT COUNT(*) AS count FROM security_events WHERE source='waf' AND action='block'"
+            ).fetchone()["count"],
+        }
+
+
+def prune_security_events(keep_latest=5000):
+    with get_conn() as conn:
+        conn.execute(
+            """
+            DELETE FROM security_events
+            WHERE id NOT IN (
+                SELECT id FROM security_events ORDER BY created_at DESC, id DESC LIMIT ?
+            )
+            """,
+            (keep_latest,),
+        )
 
 
 # ── 소유권 인증 ──────────────────────────────────────────────
