@@ -19,8 +19,7 @@ RUN git clone --depth 1 https://github.com/sullo/nikto.git /opt/nikto \
     && ln -s /opt/nikto/program/nikto.pl /usr/local/bin/nikto \
     && chmod +x /opt/nikto/program/nikto.pl
 
-RUN NUCLEI_VER=$(curl -s https://api.github.com/repos/projectdiscovery/nuclei/releases/latest \
-    | grep '"tag_name"' | cut -d'"' -f4 | sed 's/v//') \
+RUN NUCLEI_VER=3.8.0 \
     && wget -q "https://github.com/projectdiscovery/nuclei/releases/download/v${NUCLEI_VER}/nuclei_${NUCLEI_VER}_linux_amd64.zip" \
     -O /tmp/nuclei.zip \
     && unzip -q /tmp/nuclei.zip -d /usr/local/bin/ \

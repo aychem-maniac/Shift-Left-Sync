@@ -8,7 +8,7 @@ import uuid
 import os
 import json
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sls_scanner.services.scanner_service import (
     run_scan_job,
@@ -709,7 +709,11 @@ def _status_class(status):
 def _fmt_datetime(value):
     if not value:
         return "-"
-    return str(value).replace("T", " ")[:16]
+    raw = str(value).replace("T", " ")
+    try:
+        return (datetime.fromisoformat(raw) + timedelta(hours=9)).strftime("%Y-%m-%d %H:%M")
+    except ValueError:
+        return raw[:16]
 
 
 def _report_type_label(report_type):
