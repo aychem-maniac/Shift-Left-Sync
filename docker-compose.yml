@@ -34,10 +34,12 @@ services:
       - ZAP_ADDRESS=zap
       - ZAP_PORT=8080
       - ZAP_API_KEY=sls-secret-2026
+      - WAF_AUDIT_LOG_PATH=/app/logs/waf/audit.log
       - MAX_CONCURRENT_SCANS=3   # 동시 스캔 수 (ZAP 메모리 감안해 조정)
     volumes:
       - ./results:/app/results
       - ./data:/app/data
+      - ./logs/waf:/app/logs/waf:ro
     networks:
       - sls_net
     depends_on:

@@ -8,16 +8,19 @@ from database import log_security_event
 WAF_AUDIT_LOG_PATH = os.getenv("WAF_AUDIT_LOG_PATH", "logs/waf/audit.log")
 
 
+# None 값이 들어와도 문자열 처리 중 예외가 나지 않도록 빈 문자열로 맞춘다.
 def _text(value):
     if value is None:
         return ""
     return str(value)
 
 
+# 관리자 화면에 너무 긴 payload/reason이 그대로 노출되지 않도록 길이를 제한한다.
 def _clip(value, limit=500):
     return _text(value).strip()[:limit]
 
 
+# ModSecurity severity는 숫자와 문자열이 섞여 들어올 수 있어 내부 등급으로 통일한다.
 def _normalize_severity(value):
     raw = _text(value).strip().lower()
     if raw in {"critical", "high", "medium", "low"}:
@@ -38,6 +41,7 @@ def _normalize_severity(value):
     return "low"
 
 
+# 룰 메시지와 태그를 기준으로 보안 이벤트 유형을 대략 분류한다.
 def _event_type(message, tags):
     blob = " ".join([_text(message), " ".join(_text(t) for t in tags)]).lower()
     if any(v in blob for v in ("attack-sqli", "sql injection", "sqli")):
@@ -53,6 +57,7 @@ def _event_type(message, tags):
     return "rule_match"
 
 
+# audit.log는 단일 JSON, JSON 배열, 연속 JSON 객체 형식이 모두 가능해서 순차 파싱한다.
 def _iter_json_entries(path):
     if not os.path.exists(path):
         return
@@ -74,6 +79,7 @@ def _iter_json_entries(path):
     except json.JSONDecodeError:
         pass
 
+    # JSON 객체가 줄 단위로 이어붙은 Serial 로그 형식도 처리한다.
     decoder = json.JSONDecoder()
     idx = 0
     length = len(content)
@@ -92,6 +98,7 @@ def _iter_json_entries(path):
         idx = next_idx
 
 
+# audit entry 안에서 실제 룰 매칭 메시지 목록을 꺼낸다.
 def _messages(entry):
     tx = entry.get("transaction") if isinstance(entry, dict) else {}
     tx = tx if isinstance(tx, dict) else {}
@@ -101,6 +108,7 @@ def _messages(entry):
     return messages if isinstance(messages, list) else []
 
 
+# ModSecurity 로그 1건과 메시지 1개를 security_events 테이블 저장 형식으로 변환한다.
 def _build_event(entry, message, index):
     tx = entry.get("transaction") if isinstance(entry, dict) else {}
     tx = tx if isinstance(tx, dict) else {}
@@ -121,6 +129,7 @@ def _build_event(entry, message, index):
     payload = details.get("data") or details.get("match") or request.get("body") or path
     unique_id = tx.get("unique_id") or entry.get("unique_id")
     raw = json.dumps({"transaction": tx, "message": message}, ensure_ascii=False, default=str)
+    # unique_id가 없는 로그도 중복 저장을 피할 수 있도록 raw 내용 기반 event_id를 만든다.
     fallback = hashlib.sha1(f"{raw}:{index}".encode("utf-8", errors="ignore")).hexdigest()
     event_id = f"waf:{unique_id}:{rule_id}:{index}" if unique_id else f"waf:{fallback}"
 
@@ -146,6 +155,7 @@ def _build_event(entry, message, index):
     }
 
 
+# audit.log를 DB에 적재하고, high/critical 이벤트는 SOAR 대응 로그도 함께 남긴다.
 def ingest_waf_audit_log(path=WAF_AUDIT_LOG_PATH):
     ingested = 0
     responded = 0
