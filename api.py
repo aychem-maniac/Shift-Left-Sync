@@ -723,7 +723,7 @@ def _fmt_datetime(value):
         return "-"
     raw = str(value).replace("T", " ")
     try:
-        return (datetime.fromisoformat(raw) + timedelta(hours=9)).strftime("%Y-%m-%d %H:%M")
+        return datetime.fromisoformat(raw).strftime("%Y-%m-%d %H:%M")
     except ValueError:
         return raw[:16]
 
