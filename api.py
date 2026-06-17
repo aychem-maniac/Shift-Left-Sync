@@ -50,12 +50,14 @@ _BOT_RATE_WINDOW = 60                  # 초
 _BOT_AUTO_THRESHOLD = 3                # 탐지 횟수 → 자동 차단
 _ip_strike: dict[str, int] = {}        # ip → 누적 탐지 횟수
 
+# 요청 IP가 현재 블랙리스트에 있는지 확인한다.
 def _is_blacklisted(ip: str) -> tuple[bool, str]:
     entry = _ip_blacklist.get(ip)
     if not entry:
         return False, ""
     return True, entry.get("reason", "블랙리스트")
 
+# 특정 IP를 수동/자동 블랙리스트에 등록한다.
 def _add_blacklist(ip: str, reason: str, auto: bool = True):
     _ip_blacklist[ip] = {
         "reason":     reason,
@@ -64,6 +66,7 @@ def _add_blacklist(ip: str, reason: str, auto: bool = True):
     }
     print(f"  [BLACKLIST] {ip} 차단 — {reason}")
 
+# 요청 경로/메서드/빈도를 분석해 봇성 요청이면 strike를 누적하고 임계치 초과 시 차단한다.
 def _analyze_request(ip: str, method: str, path: str):
     """요청 패턴 분석 → 봇 탐지 시 strike 누적 → 임계값 초과 시 자동 차단"""
     if ip in _ip_blacklist:
@@ -153,6 +156,7 @@ API_KEY = os.getenv("API_KEY", "sls-secret-2026")
 
 
 @app.middleware("http")
+# 모든 HTTP 요청에 대해 블랙리스트 차단과 봇성 요청 분석을 수행한다.
 async def bot_blacklist_middleware(request: Request, call_next):
     import time as _time
     ip  = request.client.host if request.client else "unknown"
@@ -175,6 +179,7 @@ async def bot_blacklist_middleware(request: Request, call_next):
 
 
 @app.on_event("startup")
+# 앱 시작 시 DB와 동시 스캔 제어 상태를 초기화하고 미완료 작업을 정리한다.
 async def startup():
     global _main_loop, _scan_semaphore
     _main_loop       = asyncio.get_running_loop()
@@ -191,6 +196,7 @@ async def startup():
     print(f"[INFO] 동시 스캔 슬롯: {MAX_CONCURRENT_SCANS}개")
 
 @app.on_event("shutdown")
+# 앱 종료 시 실행 중이던 스캔 작업을 error 상태로 정리한다.
 async def shutdown():
     # 서버 종료 시 진행 중인 스캔 error 처리
     from database import get_conn
@@ -621,6 +627,7 @@ setInterval(function() {
 # ─────────────────────────────────────────────
 # 공통 헬퍼
 # ─────────────────────────────────────────────
+# 리포트 파일명 패턴을 관리자/대시보드 화면용 짧은 라벨로 변환한다.
 def _report_label(filename):
     if "simple" in filename:
         return "📄 간편"
@@ -639,6 +646,7 @@ def _report_label(filename):
     return "📄"
 
 
+# 리포트 파일명 패턴을 다운로드/표시 분기에 사용할 내부 타입으로 변환한다.
 def _report_type(filename):
     if "simple" in filename:
         return "simple_html"
@@ -657,6 +665,7 @@ def _report_type(filename):
     return "other"
 
 
+# 요청 쿠키의 세션 토큰으로 현재 로그인 사용자를 조회한다.
 def _current_user(request):
     token = request.cookies.get("sls_session")
     return get_session_user(token) if token else None
@@ -698,14 +707,17 @@ REPORT_TYPE_LABELS = {
 }
 
 
+# 작업/사용자 상태 코드를 화면에 표시할 라벨로 변환한다.
 def _status_label(status):
     return STATUS_LABELS.get(status, status)
 
 
+# 작업/사용자 상태 코드를 CSS 배지 클래스명으로 변환한다.
 def _status_class(status):
     return STATUS_CLASSES.get(status, "badge-default")
 
 
+# DB/ISO 형식 시간을 관리자 화면에서 쓰는 yyyy-mm-dd hh:mm 형식으로 정리한다.
 def _fmt_datetime(value):
     if not value:
         return "-"
@@ -716,12 +728,14 @@ def _fmt_datetime(value):
         return raw[:16]
 
 
+# 리포트 내부 타입을 화면에 표시할 리포트 종류명으로 변환한다.
 def _report_type_label(report_type):
     if not report_type:
         return "리포트"
     return REPORT_TYPE_LABELS.get(report_type, str(report_type).upper())
 
 
+# 현재 요청 사용자가 관리자이면 사용자 정보를 반환하고, 아니면 None을 반환한다.
 def _require_admin(request):
     user = _current_user(request)
     if not user or user.get("role") != "admin":
@@ -729,6 +743,7 @@ def _require_admin(request):
     return user
 
 
+# 관리자 대시보드 상단 카드에 표시할 사용자/스캔/리포트 집계를 만든다.
 def _admin_stats(users, jobs):
     today = datetime.now().strftime("%Y-%m-%d")
     pending_count = sum(1 for user in users if user.get("status") == "pending")
@@ -746,6 +761,7 @@ def _admin_stats(users, jobs):
     ]
 
 
+# 스캔 작업 목록을 관리자 히스토리 화면용 로그 항목으로 변환한다.
 def _history_logs(jobs):
     return [
         {
@@ -757,6 +773,7 @@ def _history_logs(jobs):
     ]
 
 
+# 관리자 공통 템플릿 컨텍스트를 구성해 Jinja 템플릿을 렌더링한다.
 def _admin_template(request, template_name, active_menu, user, **context):
     base_context = {
         "request": request,
@@ -771,6 +788,7 @@ def _admin_template(request, template_name, active_menu, user, **context):
     return templates.TemplateResponse(template_name, base_context)
 
 
+# 레거시 단일 페이지 화면을 공통 HTML 레이아웃으로 감싸서 반환한다.
 def _page(title, body, user=None, extra_js=""):
     admin_btn = ""
 
@@ -801,6 +819,7 @@ def _page(title, body, user=None, extra_js=""):
 # ═══════════════════════════════════════════════════════════
 # 1. 랜딩 / 로그인 / 회원가입 페이지
 # ═══════════════════════════════════════════════════════════
+# 로그인/회원가입 첫 화면을 렌더링하고, 승인된 사용자는 대시보드로 보낸다.
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request, msg: str = ""):
     u = _current_user(request)
@@ -818,6 +837,7 @@ async def index(request: Request, msg: str = ""):
     )
 
 
+# 서비스 기능 소개 페이지를 렌더링한다.
 @app.get("/features", response_class=HTMLResponse)
 async def features_page(request: Request):
     return templates.TemplateResponse(
@@ -826,6 +846,7 @@ async def features_page(request: Request):
     )
 
 
+# 리포트 안내 페이지를 렌더링한다.
 @app.get("/reports", response_class=HTMLResponse)
 async def reports_page(request: Request):
     return templates.TemplateResponse(
@@ -834,6 +855,7 @@ async def reports_page(request: Request):
     )
 
 
+# 사용 가이드 페이지를 렌더링한다.
 @app.get("/guide", response_class=HTMLResponse)
 async def guide_page(request: Request):
     return templates.TemplateResponse(
@@ -845,6 +867,7 @@ async def guide_page(request: Request):
 # ═══════════════════════════════════════════════════════════
 # 2. 인증 엔드포인트
 # ═══════════════════════════════════════════════════════════
+# 로그인 폼을 처리하고 승인된 사용자에게 세션 쿠키를 발급한다.
 @app.post("/auth/login")
 async def login(
     request: Request,
@@ -870,6 +893,7 @@ async def login(
     return resp
 
 
+# 회원가입 입력값을 검증하고 승인 대기 상태의 사용자를 생성한다.
 @app.post("/auth/register")
 async def register(
     username: str = Form(...),
@@ -901,6 +925,7 @@ async def register(
     return RedirectResponse("/?msg=회원가입 완료! 관리자 승인 후 로그인 가능합니다", status_code=302)
 
 
+# 현재 세션을 삭제하고 로그인 화면으로 되돌린다.
 @app.get("/auth/logout")
 async def logout(request: Request):
     token = request.cookies.get("sls_session")
@@ -917,6 +942,7 @@ async def logout(request: Request):
 # ═══════════════════════════════════════════════════════════
 # 3. 유저 대시보드
 # ═══════════════════════════════════════════════════════════
+# 승인된 사용자의 스캔 요청/진행/리포트 목록 대시보드를 렌더링한다.
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard(request: Request):
     u = _current_user(request)
@@ -998,6 +1024,7 @@ async def dashboard(request: Request):
 # ═══════════════════════════════════════════════════════════
 # 4. 관리자 대시보드
 # ═══════════════════════════════════════════════════════════
+# 관리자 홈 화면에 전체 사용자, 스캔, 승인 대기 현황을 표시한다.
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_dashboard_v2(request: Request):
     u = _require_admin(request)
@@ -1020,6 +1047,7 @@ async def admin_dashboard_v2(request: Request):
     )
 
 
+# 관리자 승인 대기 사용자 목록 화면을 렌더링한다.
 @app.get("/admin/pending", response_class=HTMLResponse)
 async def admin_pending(request: Request):
     u = _require_admin(request)
@@ -1039,6 +1067,7 @@ async def admin_pending(request: Request):
     )
 
 
+# 관리자 사용자 목록/상태 관리 화면을 렌더링한다.
 @app.get("/admin/users", response_class=HTMLResponse)
 async def admin_users(request: Request):
     u = _require_admin(request)
@@ -1055,6 +1084,7 @@ async def admin_users(request: Request):
     )
 
 
+# 관리자 스캔 히스토리 화면에 전체 작업 데이터를 전달한다.
 @app.get("/admin/history", response_class=HTMLResponse)
 async def admin_history(request: Request):
     u = _require_admin(request)
@@ -1076,9 +1106,13 @@ async def admin_history(request: Request):
     )
 
 
+# 관리자 보안 이벤트 화면을 렌더링하고 WAF/SOAR 이벤트를 탭 기준으로 조회한다.
 @app.get("/admin/security", response_class=HTMLResponse)
+# 관리자 보안 이벤트 화면을 렌더링한다.
+# 진입 시 WAF audit.log를 DB에 동기화하고, view 탭 기준으로 이벤트를 조회한다.
 async def admin_security(
     request: Request,
+    view: str = Query("detect", max_length=32),
     source: str = Query("", max_length=32),
     severity: str = Query("", max_length=32),
     action: str = Query("", max_length=32),
@@ -1086,12 +1120,16 @@ async def admin_security(
     u = _require_admin(request)
     if not u:
         return RedirectResponse("/")
+    # view는 보안 이벤트 화면의 탭 선택값이다. 허용값 외 입력은 기본 탐지 탭으로 돌린다.
+    if view not in {"detect", "context"}:
+        view = "detect"
 
     ingest_result = ingest_waf_audit_log()
     events = get_security_events(
         source=source or None,
         severity=severity or None,
         action=action or None,
+        view=view,
         limit=100,
     )
     stats = get_security_event_stats()
@@ -1103,11 +1141,12 @@ async def admin_security(
         u,
         events=events,
         stats=stats,
-        filters={"source": source, "severity": severity, "action": action},
+        filters={"view": view, "source": source, "severity": severity, "action": action},
         ingest_result=ingest_result,
     )
 
 
+# 승인 대기 사용자를 승인 상태로 변경한다.
 @app.post("/admin/users/{user_id}/approve")
 async def approve_user(user_id: int, request: Request):
     u = _current_user(request)
@@ -1120,6 +1159,7 @@ async def approve_user(user_id: int, request: Request):
     return RedirectResponse(ref if "/admin" in ref else "/admin/pending", status_code=302)
 
 
+# 승인 대기 사용자를 거절하고 계정을 삭제한다.
 @app.post("/admin/users/{user_id}/reject")
 async def reject_user(user_id: int, request: Request):
     u = _current_user(request)
@@ -1130,6 +1170,7 @@ async def reject_user(user_id: int, request: Request):
     ref = request.headers.get("referer", "/admin/pending")
     return RedirectResponse(ref if "/admin" in ref else "/admin/pending", status_code=302)
 
+# 관리자가 특정 사용자를 삭제한다. 자기 자신은 삭제하지 않는다.
 @app.post("/admin/users/{user_id}/delete")
 async def delete_user_endpoint(user_id: int, request: Request):
     u = _current_user(request)
@@ -1142,6 +1183,7 @@ async def delete_user_endpoint(user_id: int, request: Request):
     return RedirectResponse(ref if "/admin" in ref else "/admin/users", status_code=302)
 
 
+# 관리자가 특정 사용자의 역할을 admin/user로 변경한다.
 @app.post("/admin/users/{user_id}/role")
 async def change_role(user_id: int, request: Request, role: str = Query(...)):
     u = _current_user(request)
@@ -1157,11 +1199,13 @@ async def change_role(user_id: int, request: Request, role: str = Query(...)):
 # ═══════════════════════════════════════════════════════════
 # 6. 스캔 API
 # ═══════════════════════════════════════════════════════════
+# 스캔 시작 API에서 받는 대상 URL과 스캔 강도 요청 모델이다.
 class ScanRequest(BaseModel):
     target: str
     strength: str = "medium"
 
 
+# 스캔 작업을 생성하고, 소유권 검증이 면제/캐시된 경우 즉시 큐에 넣는다.
 @app.post("/api/scan")
 async def api_start_scan(req: ScanRequest, request: Request):
     u = _current_user(request)
@@ -1206,6 +1250,7 @@ async def api_start_scan(req: ScanRequest, request: Request):
     return result
 
 
+# 소유권 검증 토큰을 대상 사이트에서 확인한 뒤 검증 성공 시 스캔을 큐에 넣는다.
 @app.post("/api/scan/{job_id}/verify")
 async def api_verify_ownership(job_id: str, request: Request):
     u = _current_user(request)
@@ -1271,6 +1316,7 @@ async def api_verify_ownership(job_id: str, request: Request):
                 "message": "토큰을 찾을 수 없습니다. 파일 또는 메타태그를 확인하세요."}
 
 
+# 단일 스캔 작업의 현재 상태와 리포트 정보를 조회한다.
 @app.get("/api/scan/{job_id}")
 async def api_get_scan(job_id: str, request: Request):
     u = _current_user(request)
@@ -1286,6 +1332,7 @@ async def api_get_scan(job_id: str, request: Request):
     return job
 
 
+# 스캔 진행 상태를 브라우저에 SSE로 실시간 전송한다.
 @app.get("/api/scan/{job_id}/events")
 async def api_scan_events(job_id: str, request: Request):
     """SSE 스트림 - 스캔 진행 상황 실시간 전송"""
@@ -1299,6 +1346,7 @@ async def api_scan_events(job_id: str, request: Request):
 
     # 이미 완료된 잡은 즉시 done 이벤트 반환
     if job.get("status") in ("done", "error", "cancelled"):
+        # 이미 종료된 작업은 현재 상태를 한 번 보내고 SSE를 닫는다.
         async def _immediate():
             data = json.dumps({
                 "type": job.get("status"),
@@ -1315,6 +1363,7 @@ async def api_scan_events(job_id: str, request: Request):
         queue = asyncio.Queue()
         _job_sse_queues[job_id] = queue
 
+    # 진행 중인 작업은 큐 이벤트를 계속 읽어 SSE 스트림으로 전달한다.
     async def _generator():
         try:
             while True:
@@ -1347,6 +1396,7 @@ async def api_scan_events(job_id: str, request: Request):
     )
 
 
+# 관리자에게 현재 블랙리스트, strike, 최근 요청 기록을 반환한다.
 @app.get("/api/blacklist")
 async def api_get_blacklist(request: Request):
     u = _current_user(request)
@@ -1360,6 +1410,7 @@ async def api_get_blacklist(request: Request):
         "recent_requests": list(_request_log)[-50:],
     }
 
+# 관리자가 특정 IP를 수동으로 블랙리스트에 추가한다.
 @app.post("/api/blacklist/{ip}")
 async def api_add_blacklist(ip: str, request: Request):
     u = _current_user(request)
@@ -1368,6 +1419,7 @@ async def api_add_blacklist(ip: str, request: Request):
     _add_blacklist(ip, reason="관리자 수동 차단", auto=False)
     return {"blocked": True, "ip": ip}
 
+# 관리자가 특정 IP의 블랙리스트와 strike 기록을 해제한다.
 @app.delete("/api/blacklist/{ip}")
 async def api_remove_blacklist(ip: str, request: Request):
     u = _current_user(request)
@@ -1378,9 +1430,13 @@ async def api_remove_blacklist(ip: str, request: Request):
     return {"unblocked": True, "ip": ip, "was_blocked": removed is not None}
 
 
+# 보안 이벤트 목록을 JSON으로 반환하고 화면과 같은 필터 기준을 적용한다.
 @app.get("/api/security/events")
+# 보안 이벤트 목록을 JSON으로 반환한다.
+# 화면과 같은 view/source/severity/action 필터를 지원한다.
 async def api_security_events(
     request: Request,
+    view: str = Query("detect", max_length=32),
     source: str = Query("", max_length=32),
     severity: str = Query("", max_length=32),
     action: str = Query("", max_length=32),
@@ -1389,6 +1445,9 @@ async def api_security_events(
     u = _require_admin(request)
     if not u:
         raise HTTPException(403, "admin only")
+    # API도 화면과 같은 탭 기준으로 조회할 수 있게 맞춘다.
+    if view not in {"detect", "context"}:
+        view = "detect"
 
     ingest_waf_audit_log()
     return {
@@ -1396,12 +1455,15 @@ async def api_security_events(
             source=source or None,
             severity=severity or None,
             action=action or None,
+            view=view,
             limit=limit,
         )
     }
 
 
+# 보안 이벤트 통계 카드에 사용할 집계 데이터를 JSON으로 반환한다.
 @app.get("/api/security/stats")
+# 보안 이벤트 집계 정보를 JSON으로 반환한다.
 async def api_security_stats(request: Request):
     u = _require_admin(request)
     if not u:
@@ -1411,6 +1473,7 @@ async def api_security_stats(request: Request):
     return get_security_event_stats()
 
 
+# 실행 중이거나 대기 중인 스캔 작업에 취소 신호를 보낸다.
 @app.post("/api/scan/{job_id}/cancel")
 async def api_cancel_scan(job_id: str, request: Request):
     """실행 중인 스캔 취소 요청"""
@@ -1433,6 +1496,7 @@ async def api_cancel_scan(job_id: str, request: Request):
     return {"cancelled": True, "message": "취소 요청을 전달했습니다. 현재 단계 완료 후 중단됩니다."}
 
 
+# HTML 리포트에 서비스 상단 내비게이션을 삽입해 브라우저에서 보여준다.
 @app.get("/view/{filename}", response_class=HTMLResponse)
 async def view_report(filename: str, request: Request):
     u = _current_user(request)
@@ -1515,6 +1579,7 @@ body{margin-top:48px!important}
     return HTMLResponse(report_html)
 
 
+# 리포트 파일을 다운로드한다. 로그인 또는 API 키 인증을 허용한다.
 @app.get("/report/{filename}")
 async def download_report(
     filename: str,
@@ -1542,6 +1607,7 @@ async def download_report(
     return FileResponse(path, media_type=media, filename=filename)
 
 
+# 서비스 헬스체크용 단순 상태 응답을 반환한다.
 @app.get("/health")
 async def health():
     return {"status": "ok"}
@@ -1550,6 +1616,7 @@ async def health():
 # ═══════════════════════════════════════════════════════════
 # 7. 스캔 실행 백그라운드 작업
 # ═══════════════════════════════════════════════════════════
+# 특정 job_id의 SSE 큐에 진행 이벤트를 안전하게 전달한다.
 def _push_sse_for_job(job_id: str, event: dict) -> None:
     """어느 컨텍스트(스레드/코루틴)에서든 안전하게 SSE 이벤트 전송"""
     if job_id in _job_sse_queues and _main_loop:
@@ -1558,6 +1625,7 @@ def _push_sse_for_job(job_id: str, event: dict) -> None:
         )
 
 
+# 대기 중인 모든 작업에 현재 큐 위치와 동시 실행 현황을 알린다.
 def _broadcast_queue_status() -> None:
     """대기 중인 모든 잡에게 현재 슬롯 현황 SSE 전송"""
     active  = len(_active_jobs)
@@ -1575,6 +1643,7 @@ def _broadcast_queue_status() -> None:
         })
 
 
+# 동시 실행 제한을 적용해 스캔 작업을 대기열에서 실제 실행 상태로 넘긴다.
 async def _run_scan_concurrent(job_id: str, target: str, strength: str) -> None:
     """
     세마포어로 동시 실행 수를 제한.
@@ -1597,7 +1666,9 @@ async def _run_scan_concurrent(job_id: str, target: str, strength: str) -> None:
             _broadcast_queue_status()   # 슬롯 해제 → 대기 잡들에게 알림
 
 
+# scanner_service.run_scan_job을 백그라운드 executor에서 실행하고 진행/완료 상태를 DB와 SSE에 반영한다.
 async def _run_scan(job_id: str, target: str, strength: str):
+    # scanner_service에서 전달하는 진행률 콜백을 DB 업데이트와 SSE 이벤트로 변환한다.
     def cb(phase: str, pct: int):
         if pct == -1:   # 취소 신호
             _push_sse_for_job(job_id, {"type": "cancelled", "phase": phase, "progress": 0})

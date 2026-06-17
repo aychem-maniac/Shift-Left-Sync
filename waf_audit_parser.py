@@ -9,6 +9,7 @@ WAF_AUDIT_LOG_PATH = os.getenv("WAF_AUDIT_LOG_PATH", "logs/waf/audit.log")
 
 
 # ModSecurity 로그 필드는 누락될 수 있으므로 None을 빈 문자열로 맞춘다.
+# ModSecurity 로그 필드는 누락될 수 있으므로 None을 빈 문자열로 통일한다.
 def _text(value):
     if value is None:
         return ""
@@ -16,11 +17,13 @@ def _text(value):
 
 
 # 관리자 화면에서 payload/reason이 과하게 길어지지 않도록 저장 길이를 제한한다.
+# 관리자 화면에서 payload/reason이 과하게 길어지지 않도록 표시 길이를 제한한다.
 def _clip(value, limit=500):
     return _text(value).strip()[:limit]
 
 
 # ModSecurity severity는 숫자/문자열이 섞여 들어오므로 내부 등급으로 통일한다.
+# ModSecurity severity 값은 숫자/문자가 섞일 수 있어 화면용 등급으로 정규화한다.
 def _normalize_severity(value):
     raw = _text(value).strip().lower()
     if raw in {"critical", "high", "medium", "low"}:
@@ -43,7 +46,15 @@ def _normalize_severity(value):
 
 # 룰 메시지와 태그를 기준으로 관리자 화면용 이벤트 유형을 1차 분류한다.
 # CRS 룰 전체를 완벽히 매핑하는 단계는 아니므로 모호한 항목은 rule_match로 남긴다.
-def _event_type(message, tags):
+# WAF rule_id와 메시지/태그를 기준으로 관리자 화면용 이벤트 유형을 분류한다.
+# 920350/949110처럼 의미가 명확한 CRS 룰은 문자열 태그보다 rule_id를 우선한다.
+def _event_type(message, tags, rule_id=None):
+    rule_id = _text(rule_id).strip()
+    if rule_id == "920350":
+        return "host_header"
+    if rule_id == "949110":
+        return "anomaly_summary"
+
     blob = " ".join([_text(message), " ".join(_text(t) for t in tags)]).lower()
     if any(v in blob for v in ("attack-sqli", "sql injection", "sqli")):
         return "sqli"
@@ -59,6 +70,7 @@ def _event_type(message, tags):
 
 
 # audit.log는 단일 JSON, JSON 배열, 연속 JSON 객체 형식이 섞일 수 있어 모두 순차 파싱한다.
+# audit.log가 단일 JSON, JSON 배열, 연속 JSON 객체 형식이어도 순차적으로 읽어낸다.
 def _iter_json_entries(path):
     if not os.path.exists(path):
         return
@@ -100,6 +112,7 @@ def _iter_json_entries(path):
 
 
 # audit entry 안에서 실제 룰 매칭 메시지 목록을 꺼낸다.
+# audit entry 안에서 실제 WAF 룰 매칭 메시지 목록을 꺼낸다.
 def _messages(entry):
     tx = entry.get("transaction") if isinstance(entry, dict) else {}
     tx = tx if isinstance(tx, dict) else {}
@@ -109,6 +122,7 @@ def _messages(entry):
     return messages if isinstance(messages, list) else []
 
 
+# ModSecurity 로그 1건과 메시지 1개를 security_events 저장 형식으로 변환한다.
 # ModSecurity 로그 1건과 메시지 1개를 security_events 저장 형식으로 변환한다.
 def _build_event(entry, message, index):
     tx = entry.get("transaction") if isinstance(entry, dict) else {}
@@ -141,7 +155,7 @@ def _build_event(entry, message, index):
 
     return {
         "source": "waf",
-        "event_type": _event_type(msg, tags),
+        "event_type": _event_type(msg, tags, rule_id),
         "severity": _normalize_severity(details.get("severity") or message.get("severity")),
         "action": "block" if status_code == 403 else "detect",
         "ip": _clip(client_ip, 128),
@@ -156,6 +170,7 @@ def _build_event(entry, message, index):
     }
 
 
+# audit.log를 DB에 적재하고, high/critical 이벤트는 SOAR 대응 로그를 추가로 남긴다.
 # audit.log를 DB에 적재하고, high/critical 이벤트는 SOAR 대응 로그를 추가로 남긴다.
 def ingest_waf_audit_log(path=WAF_AUDIT_LOG_PATH):
     ingested = 0

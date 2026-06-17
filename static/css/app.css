@@ -129,6 +129,33 @@ a {
   font-size: 14px;
 }
 
+/* 보안 이벤트 화면의 탐지/대응 탭 스타일 */
+.security-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.security-tab {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 8px 14px;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  background: #111827;
+  color: #9ca3af;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.security-tab.is-active {
+  border-color: rgba(37, 99, 235, 0.55);
+  background: rgba(37, 99, 235, 0.18);
+  color: #bfdbfe;
+}
+
 .table-panel {
   overflow: hidden;
 }
@@ -171,6 +198,11 @@ th {
 
 tr:hover td {
   background: #1f1f1f;
+}
+
+/* SOAR 대응/CRS 요약 로그는 실제 탐지 row보다 덜 강조한다. */
+.context-row td {
+  color: #9ca3af;
 }
 
 .url-cell {

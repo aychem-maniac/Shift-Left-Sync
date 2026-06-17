@@ -5,6 +5,7 @@ from contextlib import contextmanager
 DB_PATH = os.getenv("DB_PATH", "data/sls.db")
 
 @contextmanager
+# SQLite 연결을 열고 트랜잭션 commit/rollback/close를 공통 처리한다.
 def get_conn():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -18,6 +19,7 @@ def get_conn():
     finally:
         conn.close()
 
+# 필요한 DB 디렉터리와 테이블/인덱스를 생성하고 기본 관리자 계정을 보장한다.
 def init_db():
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     with get_conn() as conn:
@@ -109,13 +111,16 @@ def init_db():
             ("admin", "admin@sls.local", hash_pw("admin1234"), "admin", "approved")
         )
 
+# 비밀번호를 고정 salt 기반 PBKDF2 해시로 변환한다.
 def hash_pw(password):
     salt = "sls-static-salt-2026"
     return hashlib.pbkdf2_hmac("sha256", password.encode(), salt.encode(), 260000).hex()
 
+# 입력 비밀번호가 저장된 해시와 일치하는지 확인한다.
 def verify_pw(password, hashed):
     return hash_pw(password) == hashed
 
+# 신규 사용자를 pending 상태로 생성하고 생성된 사용자 정보를 반환한다.
 def create_user(username, email, password):
     try:
         with get_conn() as conn:
@@ -127,16 +132,19 @@ def create_user(username, email, password):
     except sqlite3.IntegrityError:
         return None
 
+# username으로 사용자 1명을 조회한다.
 def get_user_by_username(username):
     with get_conn() as conn:
         row = conn.execute("SELECT * FROM users WHERE username=?", (username,)).fetchone()
         return dict(row) if row else None
 
+# user_id로 사용자 1명을 조회한다.
 def get_user_by_id(user_id):
     with get_conn() as conn:
         row = conn.execute("SELECT * FROM users WHERE id=?", (user_id,)).fetchone()
         return dict(row) if row else None
 
+# 거절 상태를 제외한 전체 사용자 목록을 최신순으로 조회한다.
 def get_all_users():
     with get_conn() as conn:
         rows = conn.execute(
@@ -144,6 +152,7 @@ def get_all_users():
         ).fetchall()
         return [dict(r) for r in rows]
 
+# 사용자 승인 상태를 변경하고 승인 시 승인 시간/승인자도 기록한다.
 def update_user_status(user_id, status, approved_by=None):
     with get_conn() as conn:
         if status == "approved":
@@ -154,15 +163,18 @@ def update_user_status(user_id, status, approved_by=None):
         else:
             conn.execute("UPDATE users SET status=? WHERE id=?", (status, user_id))
 
+# 사용자의 역할을 admin/user 값으로 변경한다.
 def update_user_role(user_id, role):
     with get_conn() as conn:
         conn.execute("UPDATE users SET role=? WHERE id=?", (role, user_id))
 
+# 사용자를 삭제한다. 연결된 세션/스캔/리포트는 외래키 CASCADE로 함께 정리된다.
 def delete_user(user_id):
     with get_conn() as conn:
         # 세션, 스캔잡, 리포트는 CASCADE로 자동 삭제
         conn.execute("DELETE FROM users WHERE id=?", (user_id,))
 
+# 로그인 세션 토큰을 생성하고 24시간 만료 시각과 함께 저장한다.
 def create_session(user_id):
     token = secrets.token_hex(32)
     expires = (datetime.now() + timedelta(hours=24)).strftime("%Y-%m-%d %H:%M:%S")
@@ -173,6 +185,7 @@ def create_session(user_id):
         )
     return token
 
+# 세션 토큰이 유효하면 연결된 사용자 정보를 반환한다.
 def get_session_user(token):
     if not token:
         return None
@@ -184,10 +197,12 @@ def get_session_user(token):
         """, (token,)).fetchone()
         return dict(row) if row else None
 
+# 로그아웃 시 세션 토큰을 삭제한다.
 def delete_session(token):
     with get_conn() as conn:
         conn.execute("DELETE FROM sessions WHERE token=?", (token,))
 
+# 새 스캔 작업을 생성하고 생성된 작업 정보를 반환한다.
 def create_job(job_id, user_id, target, strength):
     with get_conn() as conn:
         conn.execute(
@@ -196,6 +211,7 @@ def create_job(job_id, user_id, target, strength):
         )
     return get_job(job_id)
 
+# job_id로 스캔 작업 1건과 연결된 리포트 목록을 조회한다.
 def get_job(job_id):
     with get_conn() as conn:
         row = conn.execute("SELECT * FROM scan_jobs WHERE job_id=?", (job_id,)).fetchone()
@@ -205,6 +221,7 @@ def get_job(job_id):
         job["reports"] = get_job_reports(job_id)
         return job
 
+# 전달된 필드만 골라 스캔 작업 상태/진행률/단계 등을 갱신한다.
 def update_job(job_id, **kwargs):
     if not kwargs:
         return
@@ -213,6 +230,7 @@ def update_job(job_id, **kwargs):
         conn.execute("UPDATE scan_jobs SET " + sets + " WHERE job_id=?",
                      (*kwargs.values(), job_id))
 
+# 특정 사용자의 스캔 작업 목록과 각 작업의 리포트를 최신순으로 조회한다.
 def get_user_jobs(user_id):
     with get_conn() as conn:
         rows = conn.execute(
@@ -224,6 +242,7 @@ def get_user_jobs(user_id):
             j["reports"] = get_job_reports(j["job_id"])
         return jobs
 
+# 관리자 화면용으로 전체 스캔 작업과 요청자 username, 리포트 목록을 조회한다.
 def get_all_jobs():
     with get_conn() as conn:
         rows = conn.execute("""
@@ -236,6 +255,7 @@ def get_all_jobs():
             j["reports"] = get_job_reports(j["job_id"])
         return jobs
 
+# 스캔 결과 리포트 파일 정보와 취약점 집계 값을 저장한다.
 def save_report(job_id, report_type, filename, counts=None):
     c = counts or {}
     with get_conn() as conn:
@@ -246,6 +266,7 @@ def save_report(job_id, report_type, filename, counts=None):
              c.get("unverified",0), c.get("high",0), c.get("medium",0))
         )
 
+# 특정 스캔 작업에 연결된 리포트 목록을 조회한다.
 def get_job_reports(job_id):
     with get_conn() as conn:
         rows = conn.execute(
@@ -254,6 +275,9 @@ def get_job_reports(job_id):
         return [dict(r) for r in rows]
 
 
+# WAF/SOAR 보안 이벤트 1건을 security_events 테이블에 저장한다.
+# event_id가 같으면 INSERT OR IGNORE로 중복 적재를 막는다.
+# WAF/SOAR 보안 이벤트 1건을 저장하고 event_id 기준 중복 적재를 막는다.
 def log_security_event(
     source="waf",
     event_type="rule_match",
@@ -296,9 +320,19 @@ def log_security_event(
         return cur.rowcount > 0
 
 
-def get_security_events(source=None, severity=None, action=None, limit=100):
+# 관리자 화면과 API에서 사용할 보안 이벤트 목록을 조회한다.
+# view=detect는 실제 탐지 중심, view=context는 SOAR 대응/요약 로그 중심으로 나눈다.
+# 관리자 화면/API에서 사용할 보안 이벤트 목록을 필터와 탭 기준으로 조회한다.
+def get_security_events(source=None, severity=None, action=None, limit=100, view="detect"):
     where = []
     params = []
+    # 기본 탭은 실제 탐지 중심으로 보여주고, SOAR 대응/CRS 요약 룰은 보조 탭으로 분리한다.
+    if view == "context":
+        where.append("(source=? OR event_type=?)")
+        params.extend(["soar", "anomaly_summary"])
+    else:
+        where.append("(source!=? AND event_type!=?)")
+        params.extend(["soar", "anomaly_summary"])
     if source:
         where.append("source=?")
         params.append(source)
@@ -320,6 +354,8 @@ def get_security_events(source=None, severity=None, action=None, limit=100):
         return [dict(r) for r in rows]
 
 
+# 보안 이벤트 화면 상단 카드에 표시할 집계 값을 계산한다.
+# 보안 이벤트 화면 상단 카드에 표시할 전체/위험도/동작별 집계 값을 계산한다.
 def get_security_event_stats():
     def grouped(conn, field):
         rows = conn.execute(
@@ -347,6 +383,7 @@ def get_security_event_stats():
         }
 
 
+# security_events 테이블이 과도하게 커지지 않도록 최신 N건만 남기고 정리한다.
 def prune_security_events(keep_latest=5000):
     with get_conn() as conn:
         conn.execute(
@@ -361,6 +398,7 @@ def prune_security_events(keep_latest=5000):
 
 
 # ── 소유권 인증 ──────────────────────────────────────────────
+# 스캔 대상 소유권 검증에 사용할 토큰을 작업별로 생성/갱신한다.
 def create_verify_token(job_id, token, target):
     with get_conn() as conn:
         conn.execute(
@@ -368,6 +406,7 @@ def create_verify_token(job_id, token, target):
             (job_id, token, target)
         )
 
+# job_id에 연결된 소유권 검증 토큰 정보를 조회한다.
 def get_verify_token(job_id):
     with get_conn() as conn:
         row = conn.execute(
@@ -375,6 +414,7 @@ def get_verify_token(job_id):
         ).fetchone()
         return dict(row) if row else None
 
+# 소유권 검증 상태와 검증 방법을 갱신하고 검증 시각을 기록한다.
 def update_verify_status(job_id, status, method=None):
     with get_conn() as conn:
         conn.execute(
@@ -384,6 +424,7 @@ def update_verify_status(job_id, status, method=None):
 
 # ── 소유권 인증 캐시 (24시간) ────────────────────────────────────
 
+# 24시간 내 유효한 소유권 검증 캐시가 있는지 조회한다.
 def get_verified_target(target: str) -> dict | None:
     """24시간 이내 유효한 소유권 인증 기록 조회. 없거나 만료 시 None."""
     with get_conn() as conn:
@@ -395,6 +436,7 @@ def get_verified_target(target: str) -> dict | None:
         return dict(row) if row else None
 
 
+# 소유권 검증 성공 대상을 24시간 유효 캐시로 저장하거나 갱신한다.
 def upsert_verified_target(target: str, user_id: int) -> None:
     """소유권 인증 성공 시 24시간 캐시 저장 (동일 타겟이면 갱신)."""
     with get_conn() as conn:
