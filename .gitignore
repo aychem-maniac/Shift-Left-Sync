@@ -9,5 +9,6 @@ logs/
 sls_scanner/scanners/1.env
 *.csv
 *.json
+!observability/grafana/dashboards/*.json
 *.html
 !templates/**/*.html

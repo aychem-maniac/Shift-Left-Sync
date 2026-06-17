@@ -1,0 +1,61 @@
+services:
+  loki:
+    image: grafana/loki:3.7.2
+    container_name: sls_loki
+    command: -config.file=/etc/loki/loki-config.yml
+    volumes:
+      - ./observability/loki/loki-config.yml:/etc/loki/loki-config.yml:ro
+      - loki-data:/loki
+    networks:
+      - sls_net
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:13.0.2
+    container_name: sls_grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=sls-admin-2026
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - sls_net
+    depends_on:
+      - loki
+    restart: unless-stopped
+
+  alloy:
+    image: grafana/alloy:v1.16.3
+    container_name: sls_alloy
+    user: "0:0"
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --storage.path=/var/lib/alloy/data
+    volumes:
+      - ./observability/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - ./logs/waf:/var/log/sls/waf:ro
+      - alloy-data:/var/lib/alloy
+    networks:
+      - sls_net
+    depends_on:
+      loki:
+        condition: service_started
+      waf-log-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  grafana-data:
+  loki-data:
+  alloy-data:
+
+networks:
+  sls_net:
+    external: false

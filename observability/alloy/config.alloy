@@ -1,0 +1,18 @@
+loki.source.file "waf_audit" {
+  targets = [
+    {
+      __path__ = "/var/log/sls/waf/audit.log",
+      job = "waf",
+      service = "modsecurity",
+      log_type = "audit",
+    },
+  ]
+
+  forward_to = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

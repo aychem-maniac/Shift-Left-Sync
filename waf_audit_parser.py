@@ -185,7 +185,7 @@ def ingest_waf_audit_log(path=WAF_AUDIT_LOG_PATH):
                 continue
 
             ingested += 1
-            if event["severity"] in {"high", "critical"}:
+            if event["severity"] in {"high", "critical"} and event["event_type"] != "anomaly_summary":
                 response_event = dict(event)
                 response_event.update(
                     {
