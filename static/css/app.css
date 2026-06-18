@@ -156,6 +156,68 @@ a {
   color: #bfdbfe;
 }
 
+.waf-admin-panel {
+  margin-bottom: 18px;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  background: #151515;
+  overflow: hidden;
+}
+
+.compact-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.waf-mode,
+.waf-rule-path {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.waf-admin-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.waf-block-form {
+  display: grid;
+  grid-template-columns: minmax(160px, 220px) minmax(200px, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.waf-reload-form {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+}
+
+.waf-blocklist-wrap {
+  max-height: 280px;
+}
+
+.inline-block-form {
+  display: inline-flex;
+  margin-left: 8px;
+}
+
+.mini-action {
+  min-height: 24px;
+  padding: 3px 8px;
+  border: 1px solid rgba(37, 99, 235, 0.45);
+  border-radius: 6px;
+  background: rgba(37, 99, 235, 0.18);
+  color: #bfdbfe;
+  cursor: pointer;
+  font-size: 12px;
+}
+
 .table-panel {
   overflow: hidden;
 }

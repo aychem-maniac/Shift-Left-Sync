@@ -101,10 +101,20 @@ def init_db():
                 raw_json       TEXT,
                 created_at     TEXT    NOT NULL DEFAULT (datetime('now','localtime'))
             );
+            CREATE TABLE IF NOT EXISTS waf_ip_blocklist (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                ip          TEXT    NOT NULL UNIQUE,
+                reason      TEXT,
+                source      TEXT    NOT NULL DEFAULT 'manual',
+                created_by  INTEGER REFERENCES users(id),
+                created_at  TEXT    NOT NULL DEFAULT (datetime('now','localtime'))
+            );
             CREATE INDEX IF NOT EXISTS idx_security_events_created
                 ON security_events(created_at);
             CREATE INDEX IF NOT EXISTS idx_security_events_filters
                 ON security_events(source, severity, action);
+            CREATE INDEX IF NOT EXISTS idx_waf_ip_blocklist_created
+                ON waf_ip_blocklist(created_at);
         """)
         conn.execute(
             "INSERT OR IGNORE INTO users (username,email,password_hash,role,status) VALUES (?,?,?,?,?)",
@@ -384,6 +394,47 @@ def get_security_event_stats():
 
 
 # security_events 테이블이 과도하게 커지지 않도록 최신 N건만 남기고 정리한다.
+def add_waf_block_ip(ip, reason=None, source="manual", created_by=None):
+    with get_conn() as conn:
+        conn.execute(
+            """
+            INSERT INTO waf_ip_blocklist (ip, reason, source, created_by)
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(ip) DO UPDATE SET
+                reason=excluded.reason,
+                source=excluded.source,
+                created_by=excluded.created_by,
+                created_at=datetime('now','localtime')
+            """,
+            (ip, reason, source, created_by),
+        )
+    return get_waf_block_ip(ip)
+
+
+def remove_waf_block_ip(ip):
+    with get_conn() as conn:
+        cur = conn.execute("DELETE FROM waf_ip_blocklist WHERE ip=?", (ip,))
+        return cur.rowcount > 0
+
+
+def get_waf_block_ip(ip):
+    with get_conn() as conn:
+        row = conn.execute("SELECT * FROM waf_ip_blocklist WHERE ip=?", (ip,)).fetchone()
+        return dict(row) if row else None
+
+
+def get_waf_blocklist():
+    with get_conn() as conn:
+        rows = conn.execute(
+            "SELECT * FROM waf_ip_blocklist ORDER BY created_at DESC, id DESC"
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def is_waf_blocked_ip(ip):
+    return get_waf_block_ip(ip) is not None
+
+
 def prune_security_events(keep_latest=5000):
     with get_conn() as conn:
         conn.execute(

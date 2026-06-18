@@ -38,11 +38,16 @@ services:
       - ZAP_API_KEY=sls-secret-2026
       # FastAPI는 /admin/security 적재를 위해 host에 남긴 WAF audit log를 읽는다.
       - WAF_AUDIT_LOG_PATH=/app/logs/waf/audit.log
+      - WAF_RULE_ENGINE=${WAF_RULE_ENGINE:-DetectionOnly}
+      - WAF_BLOCKLIST_RULE_PATH=/app/config/waf/ip-blocklist.conf
+      - WAF_RELOAD_COMMAND=${WAF_RELOAD_COMMAND:-docker exec sls_waf nginx -s reload}
+      - APP_BOT_GUARD_ENABLED=${APP_BOT_GUARD_ENABLED:-false}
       - MAX_CONCURRENT_SCANS=3   # 동시 스캔 수 (ZAP 메모리 감안해 조정)
     volumes:
       - ./results:/app/results
       - ./data:/app/data
       - ./logs/waf:/app/logs/waf:ro
+      - ./config/waf:/app/config/waf
     networks:
       - sls_net
     depends_on:
@@ -70,7 +75,7 @@ services:
       - SERVER_NAME=localhost
       - PORT=8080
       - BACKEND=http://scanner:8000
-      - MODSEC_RULE_ENGINE=DetectionOnly
+      - MODSEC_RULE_ENGINE=${WAF_RULE_ENGINE:-DetectionOnly}
       - MODSEC_AUDIT_ENGINE=On
       # JSON Serial audit log를 ./logs/waf에 남겨 DB 적재와 이후 Loki 수집 기준으로 쓴다.
       - MODSEC_AUDIT_LOG=/var/log/modsecurity/audit.log
@@ -79,6 +84,8 @@ services:
       - PROXY_TIMEOUT=300s
     volumes:
       - ./logs/waf:/var/log/modsecurity
+      - ./config/waf/ip-blocklist.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-901-SLS-IP-BLOCKLIST.conf:ro
+      - ./config/waf/sls-custom-rules.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-902-SLS-CUSTOM-RULES.conf:ro
     networks:
       - sls_net
     depends_on:

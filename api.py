@@ -142,8 +142,12 @@ from database import (
     upsert_verified_target,
     get_security_events,
     get_security_event_stats,
+    add_waf_block_ip,
+    remove_waf_block_ip,
+    get_waf_blocklist,
 )
 from waf_audit_parser import ingest_waf_audit_log
+from waf_blocklist import normalize_ip, sync_waf_blocklist, write_blocklist_rules, reload_waf
 app = FastAPI(title="Shift-Left-Sync")
 
 # static/style.css, static/app.js 연결
@@ -158,6 +162,9 @@ API_KEY = os.getenv("API_KEY", "sls-secret-2026")
 @app.middleware("http")
 # 모든 HTTP 요청에 대해 블랙리스트 차단과 봇성 요청 분석을 수행한다.
 async def bot_blacklist_middleware(request: Request, call_next):
+    if os.getenv("APP_BOT_GUARD_ENABLED", "true").lower() in {"0", "false", "no", "off"}:
+        return await call_next(request)
+
     import time as _time
     ip  = request.client.host if request.client else "unknown"
     path   = request.url.path
@@ -176,6 +183,14 @@ async def bot_blacklist_middleware(request: Request, call_next):
     asyncio.create_task(asyncio.to_thread(_analyze_request, ip, method, path))
 
     return await call_next(request)
+
+
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    return response
 
 
 @app.on_event("startup")
@@ -1133,6 +1148,11 @@ async def admin_security(
         limit=100,
     )
     stats = get_security_event_stats()
+    blocklist = get_waf_blocklist()
+    try:
+        rule_sync = write_blocklist_rules()
+    except Exception as exc:
+        rule_sync = {"error": str(exc)}
 
     return _admin_template(
         request,
@@ -1141,6 +1161,9 @@ async def admin_security(
         u,
         events=events,
         stats=stats,
+        waf_mode=os.getenv("WAF_RULE_ENGINE", os.getenv("MODSEC_RULE_ENGINE", "DetectionOnly")),
+        waf_blocklist=blocklist,
+        waf_rule_sync=rule_sync,
         filters={"view": view, "source": source, "severity": severity, "action": action},
         ingest_result=ingest_result,
     )
@@ -1431,6 +1454,104 @@ async def api_remove_blacklist(ip: str, request: Request):
 
 
 # 보안 이벤트 목록을 JSON으로 반환하고 화면과 같은 필터 기준을 적용한다.
+def _security_redirect(request: Request):
+    ref = request.headers.get("referer", "/admin/security")
+    return RedirectResponse(ref if "/admin/security" in ref else "/admin/security", status_code=303)
+
+
+@app.get("/api/waf/blocklist")
+async def api_get_waf_blocklist(request: Request):
+    u = _require_admin(request)
+    if not u:
+        raise HTTPException(403, "admin only")
+    return {
+        "items": get_waf_blocklist(),
+        "mode": os.getenv("WAF_RULE_ENGINE", os.getenv("MODSEC_RULE_ENGINE", "DetectionOnly")),
+    }
+
+
+@app.post("/api/waf/blocklist")
+async def api_add_waf_blocklist_from_form(
+    request: Request,
+    ip: str = Form(...),
+    reason: str = Form(""),
+):
+    u = _require_admin(request)
+    if not u:
+        raise HTTPException(403, "admin only")
+
+    normalized_ip = normalize_ip(ip)
+    add_waf_block_ip(
+        normalized_ip,
+        reason=reason or "admin manual block",
+        source="manual",
+        created_by=u.get("id"),
+    )
+    sync_waf_blocklist(reload=True)
+    return _security_redirect(request)
+
+
+@app.post("/api/waf/blocklist/{ip}")
+async def api_add_waf_blocklist(ip: str, request: Request):
+    u = _require_admin(request)
+    if not u:
+        raise HTTPException(403, "admin only")
+
+    normalized_ip = normalize_ip(ip)
+    item = add_waf_block_ip(
+        normalized_ip,
+        reason="admin manual block",
+        source="manual",
+        created_by=u.get("id"),
+    )
+    sync_result = sync_waf_blocklist(reload=True)
+    return {"blocked": True, "item": item, "sync": sync_result}
+
+
+@app.post("/api/waf/blocklist/remove")
+async def api_remove_waf_blocklist_from_form(request: Request, ip: str = Form(...)):
+    u = _require_admin(request)
+    if not u:
+        raise HTTPException(403, "admin only")
+
+    normalized_ip = normalize_ip(ip)
+    remove_waf_block_ip(normalized_ip)
+    sync_waf_blocklist(reload=True)
+    return _security_redirect(request)
+
+
+@app.delete("/api/waf/blocklist/{ip}")
+async def api_remove_waf_blocklist(ip: str, request: Request):
+    u = _require_admin(request)
+    if not u:
+        raise HTTPException(403, "admin only")
+
+    normalized_ip = normalize_ip(ip)
+    removed = remove_waf_block_ip(normalized_ip)
+    sync_result = sync_waf_blocklist(reload=True)
+    return {"unblocked": True, "ip": normalized_ip, "was_blocked": removed, "sync": sync_result}
+
+
+@app.post("/api/waf/reload")
+async def api_reload_waf(request: Request):
+    u = _require_admin(request)
+    if not u:
+        raise HTTPException(403, "admin only")
+
+    return {"rules": write_blocklist_rules(), "reload": reload_waf()}
+
+
+@app.post("/api/waf/reload/apply")
+async def api_reload_waf_from_form(request: Request):
+    u = _require_admin(request)
+    if not u:
+        raise HTTPException(403, "admin only")
+
+    write_blocklist_rules()
+    reload_waf()
+    return _security_redirect(request)
+
+
 @app.get("/api/security/events")
 # 보안 이벤트 목록을 JSON으로 반환한다.
 # 화면과 같은 view/source/severity/action 필터를 지원한다.
