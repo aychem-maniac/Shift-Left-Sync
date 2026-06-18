@@ -23,6 +23,15 @@ services:
       retries: 10
       start_period: 40s
 
+  juice-shop:
+    image: bkimminich/juice-shop
+    container_name: juice-shop
+    expose:
+      - "3000"
+    networks:
+      - sls_net
+    restart: unless-stopped
+
   scanner:
     build:
       context: .
