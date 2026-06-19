@@ -16,6 +16,9 @@ from sls_scanner.services.scanner_service import (
     ScanCancelledError,
 )
 
+# 이 파일은 FastAPI 진입점이다.
+# 화면 라우팅, 로그인/관리자 기능, 스캔 API, WAF 보안 이벤트 API를 한곳에서 연결한다.
+
 # ── SSE / 취소 전역 상태 ─────────────────────────────────────────
 _job_sse_queues: dict[str, asyncio.Queue] = {}   # job_id → SSE Queue
 _main_loop: asyncio.AbstractEventLoop | None = None
@@ -49,6 +52,10 @@ _BOT_RATE_LIMIT = 80                   # 60초 내 N 요청 초과 시 차단
 _BOT_RATE_WINDOW = 60                  # 초
 _BOT_AUTO_THRESHOLD = 3                # 탐지 횟수 → 자동 차단
 _ip_strike: dict[str, int] = {}        # ip → 누적 탐지 횟수
+
+
+# ── 요청 방어 헬퍼 ────────────────────────────────────────────────
+# 앱 레벨 봇 가드에서 사용하는 메모리 기반 IP 차단/탐지 로직이다.
 
 # 요청 IP가 현재 블랙리스트에 있는지 확인한다.
 def _is_blacklisted(ip: str) -> tuple[bool, str]:
@@ -148,6 +155,9 @@ from database import (
 )
 from waf_audit_parser import ingest_waf_audit_log
 from waf_blocklist import normalize_ip, sync_waf_blocklist, write_blocklist_rules
+
+# ── FastAPI 앱 / 정적 파일 / 템플릿 연결 ────────────────────────────
+# templates/와 static/이 실제 런타임 화면 소스다.
 app = FastAPI(title="Shift-Left-Sync")
 
 # static/style.css, static/app.js 연결
@@ -186,6 +196,7 @@ async def bot_blacklist_middleware(request: Request, call_next):
 
 
 @app.middleware("http")
+# 모든 응답에 기본 보안 헤더를 추가해 브라우저 측 MIME sniffing과 iframe 삽입을 줄인다.
 async def security_headers_middleware(request: Request, call_next):
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
@@ -286,6 +297,7 @@ tr:hover td{background:#111827}
 """
 
 
+# 대시보드에서 SSE 연결, 폴백 폴링, 스캔 취소, 소유권 인증 UI를 처리하는 브라우저 스크립트다.
 DASHBOARD_JS = """
 <script>
 var sseConnections = {};   // job_id → EventSource
@@ -1454,11 +1466,13 @@ async def api_remove_blacklist(ip: str, request: Request):
 
 
 # 보안 이벤트 목록을 JSON으로 반환하고 화면과 같은 필터 기준을 적용한다.
+# 관리자 보안 화면에서 폼 처리 후 다시 /admin/security로 돌아가게 하는 공통 redirect 헬퍼다.
 def _security_redirect(request: Request):
     ref = request.headers.get("referer", "/admin/security")
     return RedirectResponse(ref if "/admin/security" in ref else "/admin/security", status_code=303)
 
 
+# 현재 DB에 등록된 WAF IP 차단 목록과 WAF 동작 모드를 반환한다.
 @app.get("/api/waf/blocklist")
 async def api_get_waf_blocklist(request: Request):
     u = _require_admin(request)
@@ -1470,6 +1484,7 @@ async def api_get_waf_blocklist(request: Request):
     }
 
 
+# 관리자 보안 화면의 폼 입력으로 WAF IP 차단 항목을 추가한다.
 @app.post("/api/waf/blocklist")
 async def api_add_waf_blocklist_from_form(
     request: Request,
@@ -1491,6 +1506,7 @@ async def api_add_waf_blocklist_from_form(
     return _security_redirect(request)
 
 
+# 관리자 보안 화면의 폼 입력으로 WAF IP 차단 항목을 제거한다.
 @app.post("/api/waf/blocklist/remove")
 async def api_remove_waf_blocklist_from_form(request: Request, ip: str = Form(...)):
     u = _require_admin(request)
@@ -1503,6 +1519,7 @@ async def api_remove_waf_blocklist_from_form(request: Request, ip: str = Form(..
     return _security_redirect(request)
 
 
+# JSON/API 호출로 WAF IP 차단 항목을 추가하고 룰 파일 동기화 결과를 반환한다.
 @app.post("/api/waf/blocklist/{ip}")
 async def api_add_waf_blocklist(ip: str, request: Request):
     u = _require_admin(request)
@@ -1520,6 +1537,7 @@ async def api_add_waf_blocklist(ip: str, request: Request):
     return {"blocked": True, "item": item, "sync": sync_result}
 
 
+# JSON/API 호출로 WAF IP 차단 항목을 제거하고 룰 파일 동기화 결과를 반환한다.
 @app.delete("/api/waf/blocklist/{ip}")
 async def api_remove_waf_blocklist(ip: str, request: Request):
     u = _require_admin(request)
@@ -1532,6 +1550,7 @@ async def api_remove_waf_blocklist(ip: str, request: Request):
     return {"unblocked": True, "ip": normalized_ip, "was_blocked": removed, "sync": sync_result}
 
 
+# WAF 차단 목록 룰 파일을 다시 쓰고, reload는 외부 watcher가 처리한다는 상태를 반환한다.
 @app.post("/api/waf/reload")
 async def api_reload_waf(request: Request):
     u = _require_admin(request)
@@ -1548,6 +1567,7 @@ async def api_reload_waf(request: Request):
     }
 
 
+# 관리자 보안 화면의 적용 버튼에서 WAF 차단 룰 파일을 다시 쓰고 화면으로 돌아간다.
 @app.post("/api/waf/reload/apply")
 async def api_reload_waf_from_form(request: Request):
     u = _require_admin(request)

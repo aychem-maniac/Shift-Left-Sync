@@ -1,4 +1,6 @@
 services:
+  # OWASP ZAP 취약점 스캐너 API 서버.
+  # scanner 컨테이너가 내부 Docker 네트워크에서 ZAP API로 동적 분석을 요청한다.
   zap:
     image: ghcr.io/zaproxy/zaproxy:stable
     container_name: sls_zap
@@ -12,17 +14,21 @@ services:
     environment:
       - JAVA_OPTS=-Xmx2g   # 동시 스캔 대비 ZAP 힙 메모리 확보
     ports:
+      # 호스트 8091 -> 컨테이너 8080: 로컬에서 ZAP API 상태 확인용.
       - "8091:8080"
     networks:
       - sls_net
     restart: unless-stopped
     healthcheck:
+      # scanner가 ZAP 준비 완료 후 시작되도록 ZAP API 버전 엔드포인트로 상태를 확인한다.
       test: ["CMD", "curl", "-sf", "http://localhost:8080/JSON/core/view/version/"]
       interval: 15s
       timeout: 10s
       retries: 10
       start_period: 40s
 
+  # 테스트 대상 애플리케이션.
+  # 외부에 직접 포트를 열지 않고 WAF/scanner가 sls_net 내부에서 접근한다.
   juice-shop:
     image: bkimminich/juice-shop
     container_name: juice-shop
@@ -32,6 +38,8 @@ services:
       - sls_net
     restart: unless-stopped
 
+  # Shift-Left-Sync FastAPI 애플리케이션과 스캔 오케스트레이터.
+  # ZAP 연동, 결과 저장, WAF 로그 조회, 관리자 화면 API를 담당한다.
   scanner:
     build:
       context: .
@@ -53,6 +61,7 @@ services:
       - APP_BOT_GUARD_ENABLED=${APP_BOT_GUARD_ENABLED:-false}
       - MAX_CONCURRENT_SCANS=3   # 동시 스캔 수 (ZAP 메모리 감안해 조정)
     volumes:
+      # 스캔 결과, SQLite 데이터, WAF 로그, WAF 설정 파일을 컨테이너에 연결한다.
       - ./results:/app/results
       - ./data:/app/data
       - ./logs/waf:/app/logs/waf:ro
@@ -60,10 +69,12 @@ services:
     networks:
       - sls_net
     depends_on:
+      # ZAP API가 준비된 뒤 scanner가 시작되도록 보장한다.
       zap:
         condition: service_healthy
     restart: unless-stopped
 
+  # WAF 컨테이너 시작 전 audit.log 파일과 권한을 준비하는 1회성 초기화 컨테이너.
   waf-log-init:
     image: busybox:1.36
     container_name: sls_waf_log_init
@@ -73,10 +84,13 @@ services:
       - ./logs/waf:/waf
     restart: "no"
 
+  # OWASP ModSecurity CRS 기반 WAF 프록시.
+  # 외부 요청을 받아 scanner FastAPI로 전달하기 전에 CRS/커스텀 규칙을 적용한다.
   waf:
     image: owasp/modsecurity-crs:nginx
     container_name: sls_waf
     ports:
+      # 호스트 8088 -> WAF 8080: 사용자는 이 포트로 보호된 앱에 접근한다.
       - "8088:8080"
     environment:
       # ModSecurity audit log 시간도 scanner/admin 화면과 같은 시간대로 맞춘다.
@@ -92,12 +106,14 @@ services:
       - MODSEC_AUDIT_LOG_TYPE=Serial
       - PROXY_TIMEOUT=300s
     volumes:
+      # WAF audit log는 host에 남기고, SLS 커스텀 규칙 파일은 읽기 전용으로 주입한다.
       - ./logs/waf:/var/log/modsecurity
       - ./config/waf/ip-blocklist.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-901-SLS-IP-BLOCKLIST.conf:ro
       - ./config/waf/sls-custom-rules.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-902-SLS-CUSTOM-RULES.conf:ro
     networks:
       - sls_net
     depends_on:
+      # scanner와 로그 파일 초기화가 끝난 뒤 WAF를 시작한다.
       scanner:
         condition: service_started
       waf-log-init:
@@ -105,5 +121,6 @@ services:
     restart: unless-stopped
 
 networks:
+  # 서비스 간 통신 전용 bridge 네트워크.
   sls_net:
     driver: bridge
