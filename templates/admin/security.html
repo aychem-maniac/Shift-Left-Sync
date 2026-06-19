@@ -40,10 +40,8 @@
       {% else %}
       <p class="waf-rule-path">Rule sync: {{ waf_rule_sync.count }}건 / {{ waf_rule_sync.path }}</p>
       {% endif %}
+      <p class="waf-rule-path">IP 차단 목록 변경 시 WAF reload는 서버에서 자동 반영됩니다.</p>
     </div>
-    <form class="waf-reload-form" method="post" action="/api/waf/reload/apply">
-      <button class="btn btn-change-role" type="submit">WAF reload</button>
-    </form>
   </div>
 
   <div class="waf-admin-grid">

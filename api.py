@@ -147,7 +147,7 @@ from database import (
     get_waf_blocklist,
 )
 from waf_audit_parser import ingest_waf_audit_log
-from waf_blocklist import normalize_ip, sync_waf_blocklist, write_blocklist_rules, reload_waf
+from waf_blocklist import normalize_ip, sync_waf_blocklist, write_blocklist_rules
 app = FastAPI(title="Shift-Left-Sync")
 
 # static/style.css, static/app.js 연결
@@ -1487,7 +1487,7 @@ async def api_add_waf_blocklist_from_form(
         source="manual",
         created_by=u.get("id"),
     )
-    sync_waf_blocklist(reload=True)
+    sync_waf_blocklist(reload=False)
     return _security_redirect(request)
 
 
@@ -1504,7 +1504,7 @@ async def api_add_waf_blocklist(ip: str, request: Request):
         source="manual",
         created_by=u.get("id"),
     )
-    sync_result = sync_waf_blocklist(reload=True)
+    sync_result = sync_waf_blocklist(reload=False)
     return {"blocked": True, "item": item, "sync": sync_result}
 
 
@@ -1516,7 +1516,7 @@ async def api_remove_waf_blocklist_from_form(request: Request, ip: str = Form(..
 
     normalized_ip = normalize_ip(ip)
     remove_waf_block_ip(normalized_ip)
-    sync_waf_blocklist(reload=True)
+    sync_waf_blocklist(reload=False)
     return _security_redirect(request)
 
 
@@ -1528,7 +1528,7 @@ async def api_remove_waf_blocklist(ip: str, request: Request):
 
     normalized_ip = normalize_ip(ip)
     removed = remove_waf_block_ip(normalized_ip)
-    sync_result = sync_waf_blocklist(reload=True)
+    sync_result = sync_waf_blocklist(reload=False)
     return {"unblocked": True, "ip": normalized_ip, "was_blocked": removed, "sync": sync_result}
 
 
@@ -1538,7 +1538,14 @@ async def api_reload_waf(request: Request):
     if not u:
         raise HTTPException(403, "admin only")
 
-    return {"rules": write_blocklist_rules(), "reload": reload_waf()}
+    return {
+        "rules": write_blocklist_rules(),
+        "reload": {
+            "ok": False,
+            "skipped": True,
+            "message": "WAF reload is handled by the host systemd watcher.",
+        },
+    }
 
 
 @app.post("/api/waf/reload/apply")
@@ -1548,7 +1555,6 @@ async def api_reload_waf_from_form(request: Request):
         raise HTTPException(403, "admin only")
 
     write_blocklist_rules()
-    reload_waf()
     return _security_redirect(request)
 
 
