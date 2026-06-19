@@ -1491,6 +1491,18 @@ async def api_add_waf_blocklist_from_form(
     return _security_redirect(request)
 
 
+@app.post("/api/waf/blocklist/remove")
+async def api_remove_waf_blocklist_from_form(request: Request, ip: str = Form(...)):
+    u = _require_admin(request)
+    if not u:
+        raise HTTPException(403, "admin only")
+
+    normalized_ip = normalize_ip(ip)
+    remove_waf_block_ip(normalized_ip)
+    sync_waf_blocklist(reload=False)
+    return _security_redirect(request)
+
+
 @app.post("/api/waf/blocklist/{ip}")
 async def api_add_waf_blocklist(ip: str, request: Request):
     u = _require_admin(request)
@@ -1506,18 +1518,6 @@ async def api_add_waf_blocklist(ip: str, request: Request):
     )
     sync_result = sync_waf_blocklist(reload=False)
     return {"blocked": True, "item": item, "sync": sync_result}
-
-
-@app.post("/api/waf/blocklist/remove")
-async def api_remove_waf_blocklist_from_form(request: Request, ip: str = Form(...)):
-    u = _require_admin(request)
-    if not u:
-        raise HTTPException(403, "admin only")
-
-    normalized_ip = normalize_ip(ip)
-    remove_waf_block_ip(normalized_ip)
-    sync_waf_blocklist(reload=False)
-    return _security_redirect(request)
 
 
 @app.delete("/api/waf/blocklist/{ip}")
