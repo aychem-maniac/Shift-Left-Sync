@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Shift-Left-Sync Admin{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', path='/css/app.css') }}">
+  <link rel="stylesheet" href="/static/css/app.css">
 </head>
 <body>
   <header class="admin-header">
@@ -27,6 +27,6 @@
   <main class="admin-main">
     {% block admin_content %}{% endblock %}
   </main>
-  <script src="{{ url_for('static', path='/js/admin.js') }}"></script>
+  <script src="/static/js/admin.js"></script>
 </body>
 </html>
