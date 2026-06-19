@@ -1,0 +1,185 @@
+{% extends "admin/layout.html" %}
+{% block title %}보안 이벤트 - Shift-Left-Sync{% endblock %}
+{% block admin_content %}
+<section class="stats-grid">
+  <article class="stat-card">
+    <p>전체 이벤트</p>
+    <strong>{{ stats.total }}</strong>
+  </article>
+  <article class="stat-card">
+    <p>High/Critical</p>
+    <strong>{{ stats.high_critical }}</strong>
+  </article>
+  <article class="stat-card">
+    <p>WAF 탐지</p>
+    <strong>{{ stats.waf_detect }}</strong>
+  </article>
+  <article class="stat-card">
+    <p>WAF 차단</p>
+    <strong>{{ stats.waf_block }}</strong>
+  </article>
+  <article class="stat-card">
+    <p>이번 동기화</p>
+    <strong>{{ ingest_result.ingested }}</strong>
+  </article>
+</section>
+
+{% set active_view = filters.view or 'detect' %}
+<nav class="security-tabs" aria-label="보안 이벤트 보기">
+  <a class="security-tab {{ 'is-active' if active_view != 'context' else '' }}" href="/admin/security?view=detect">탐지 이벤트</a>
+  <a class="security-tab {{ 'is-active' if active_view == 'context' else '' }}" href="/admin/security?view=context">대응/요약 로그</a>
+</nav>
+
+<section class="table-panel waf-admin-panel">
+  <div class="section-header compact-header">
+    <div>
+      <h2>WAF IP 차단 관리</h2>
+      <p class="waf-mode">현재 WAF 모드: {{ waf_mode }}</p>
+      {% if waf_rule_sync.error %}
+      <p class="waf-rule-path">Rule sync 실패: {{ waf_rule_sync.error }}</p>
+      {% else %}
+      <p class="waf-rule-path">Rule sync: {{ waf_rule_sync.count }}건 / {{ waf_rule_sync.path }}</p>
+      {% endif %}
+    </div>
+    <form class="waf-reload-form" method="post" action="/api/waf/reload/apply">
+      <button class="btn btn-change-role" type="submit">WAF reload</button>
+    </form>
+  </div>
+
+  <div class="waf-admin-grid">
+    <form class="waf-block-form" method="post" action="/api/waf/blocklist">
+      <label>
+        IP/CIDR
+        <input type="text" name="ip" placeholder="192.0.2.10 또는 192.0.2.0/24" required>
+      </label>
+      <label>
+        Reason
+        <input type="text" name="reason" placeholder="수동 차단 사유">
+      </label>
+      <button class="btn btn-change-role" type="submit">차단 추가</button>
+    </form>
+  </div>
+
+  <div class="table-wrap waf-blocklist-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>IP/CIDR</th>
+          <th>Reason</th>
+          <th>Source</th>
+          <th>Created</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if waf_blocklist %}
+          {% for item in waf_blocklist %}
+          <tr>
+            <td>{{ item.ip }}</td>
+            <td class="reason-cell">{{ item.reason or '-' }}</td>
+            <td>{{ item.source }}</td>
+            <td>{{ fmt_datetime(item.created_at) }}</td>
+            <td>
+              <form method="post" action="/api/waf/blocklist/remove">
+                <input type="hidden" name="ip" value="{{ item.ip }}">
+                <button class="btn btn-reset" type="submit">차단 해제</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="5" class="empty-state">현재 차단된 IP가 없습니다.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<form class="filter-bar" method="get" action="/admin/security">
+  <input type="hidden" name="view" value="{{ active_view }}">
+  <label>
+    Source
+    <select name="source">
+      <option value="" {{ 'selected' if not filters.source else '' }}>전체</option>
+      {% for value in ['waf', 'soar', 'app'] %}
+      <option value="{{ value }}" {{ 'selected' if filters.source == value else '' }}>{{ value }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>
+    Severity
+    <select name="severity">
+      <option value="" {{ 'selected' if not filters.severity else '' }}>전체</option>
+      {% for value in ['critical', 'high', 'medium', 'low'] %}
+      <option value="{{ value }}" {{ 'selected' if filters.severity == value else '' }}>{{ value }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>
+    Action
+    <select name="action">
+      <option value="" {{ 'selected' if not filters.action else '' }}>전체</option>
+      {% for value in ['detect', 'block', 'respond'] %}
+      <option value="{{ value }}" {{ 'selected' if filters.action == value else '' }}>{{ value }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <button class="btn btn-change-role" type="submit">필터 적용</button>
+  <a class="btn btn-reset" href="/admin/security">초기화</a>
+</form>
+
+<div class="notice">WAF는 DetectionOnly 기준으로 기록됩니다. SOAR 대응 로그와 CRS anomaly summary 룰은 대응/요약 로그 탭에서 별도로 확인합니다.</div>
+
+<section class="table-panel">
+  <div class="section-header">
+    <h2>{{ '대응/요약 로그' if active_view == 'context' else '최근 탐지 이벤트' }} 100건</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>시간</th>
+          <th>Source</th>
+          <th>Type</th>
+          <th>Severity</th>
+          <th>Action</th>
+          <th>IP</th>
+          <th>Method</th>
+          <th>Path</th>
+          <th>Rule</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if events %}
+          {% for event in events %}
+          <tr class="{{ 'context-row' if event.source == 'soar' or event.event_type == 'anomaly_summary' else '' }}">
+            <td>{{ fmt_datetime(event.created_at) }}</td>
+            <td>{{ event.source }}</td>
+            <td>{{ event.event_type }}</td>
+            <td><span class="status-badge severity-{{ event.severity }}">{{ event.severity }}</span></td>
+            <td><span class="status-badge action-{{ event.action }}">{{ event.action }}</span></td>
+            <td>
+              {{ event.ip or '-' }}
+              {% if event.ip %}
+              <form class="inline-block-form" method="post" action="/api/waf/blocklist">
+                <input type="hidden" name="ip" value="{{ event.ip }}">
+                <input type="hidden" name="reason" value="security event 기반 수동 차단">
+                <button class="mini-action" type="submit">WAF 차단</button>
+              </form>
+              {% endif %}
+            </td>
+            <td>{{ event.method or '-' }}</td>
+            <td class="url-cell">{{ event.path or '-' }}</td>
+            <td>{{ event.rule_id or '-' }}</td>
+            <td class="reason-cell">{{ event.reason or '-' }}</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="10" class="empty-state">표시할 보안 이벤트가 없습니다.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
