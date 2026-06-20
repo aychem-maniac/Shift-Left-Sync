@@ -104,13 +104,11 @@ services:
       - MODSEC_AUDIT_LOG_FORMAT=JSON
       - MODSEC_AUDIT_LOG_TYPE=Serial
       - PROXY_TIMEOUT=300s
-    command: ["/bin/sh", "-c", "sh /docker-entrypoint.d/99-sls-nginx-hardening.sh && nginx -g 'daemon off;'"]
     volumes:
       # WAF audit log는 host에 남기고, SLS 커스텀 규칙 파일은 읽기 전용으로 주입한다.
       - ./logs/waf:/var/log/modsecurity
       - ./config/waf/ip-blocklist.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-901-SLS-IP-BLOCKLIST.conf:ro
       - ./config/waf/sls-custom-rules.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-902-SLS-CUSTOM-RULES.conf:ro
-      - ./config/waf/nginx-hardening.sh:/docker-entrypoint.d/99-sls-nginx-hardening.sh:ro
     networks:
       - sls_net
     depends_on:
