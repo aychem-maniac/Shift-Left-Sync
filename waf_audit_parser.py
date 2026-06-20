@@ -1,11 +1,17 @@
 import hashlib
+import ipaddress
 import json
 import os
 
-from database import log_security_event
+from database import add_waf_block_ip, get_conn, get_waf_block_ip, log_security_event
+from waf_blocklist import write_blocklist_rules
 
 
 WAF_AUDIT_LOG_PATH = os.getenv("WAF_AUDIT_LOG_PATH", "logs/waf/audit.log")
+AUTO_BLOCK_RULE_IDS = {"1001101", "1001102"}
+AUTO_BLOCK_RULE_THRESHOLD = 3
+AUTO_BLOCK_RATE_WINDOW_SECONDS = 60
+AUTO_BLOCK_RATE_LIMIT = 80
 
 
 # ModSecurity 로그 필드는 누락될 수 있으므로 None을 빈 문자열로 맞춘다.
@@ -67,6 +73,88 @@ def _event_type(message, tags, rule_id=None):
     if any(v in blob for v in ("bot", "scanner", "automation")):
         return "bot"
     return "rule_match"
+
+
+# WAF 이벤트 기반 자동 차단은 외부 공인 IP만 대상으로 한다.
+def _is_auto_block_candidate(ip):
+    try:
+        addr = ipaddress.ip_address(_text(ip).strip())
+    except ValueError:
+        return False
+    return not (
+        addr.is_private
+        or addr.is_loopback
+        or addr.is_link_local
+        or addr.is_multicast
+        or addr.is_unspecified
+    )
+
+
+def _count_sensitive_rule_events(ip):
+    placeholders = ",".join("?" for _ in AUTO_BLOCK_RULE_IDS)
+    with get_conn() as conn:
+        row = conn.execute(
+            f"""
+            SELECT COUNT(*) AS count
+            FROM security_events
+            WHERE source='waf'
+              AND ip=?
+              AND rule_id IN ({placeholders})
+            """,
+            [ip, *sorted(AUTO_BLOCK_RULE_IDS)],
+        ).fetchone()
+        return row["count"] if row else 0
+
+
+def _count_recent_waf_events(ip):
+    with get_conn() as conn:
+        row = conn.execute(
+            """
+            SELECT COUNT(*) AS count
+            FROM security_events
+            WHERE source='waf'
+              AND ip=?
+              AND created_at >= datetime('now','localtime', ?)
+            """,
+            (ip, f"-{AUTO_BLOCK_RATE_WINDOW_SECONDS} seconds"),
+        ).fetchone()
+        return row["count"] if row else 0
+
+
+def _auto_block_reason(event):
+    ip = event.get("ip")
+    rule_id = _text(event.get("rule_id")).strip()
+
+    if rule_id in AUTO_BLOCK_RULE_IDS:
+        count = _count_sensitive_rule_events(ip)
+        if count >= AUTO_BLOCK_RULE_THRESHOLD:
+            return (
+                "WAF sensitive path violation threshold exceeded "
+                f"({count}/{AUTO_BLOCK_RULE_THRESHOLD})"
+            )
+
+    recent_count = _count_recent_waf_events(ip)
+    if recent_count > AUTO_BLOCK_RATE_LIMIT:
+        return (
+            "WAF request rate threshold exceeded "
+            f"({recent_count}/{AUTO_BLOCK_RATE_WINDOW_SECONDS}s)"
+        )
+
+    return ""
+
+
+def _maybe_auto_block_ip(event):
+    ip = _text(event.get("ip")).strip()
+    if not ip or not _is_auto_block_candidate(ip) or get_waf_block_ip(ip):
+        return None
+
+    reason = _auto_block_reason(event)
+    if not reason:
+        return None
+
+    item = add_waf_block_ip(ip, reason=reason, source="soar", created_by=None)
+    write_blocklist_rules()
+    return {"ip": ip, "reason": reason, "item": item}
 
 
 # audit.log는 단일 JSON, JSON 배열, 연속 JSON 객체 형식이 섞일 수 있어 모두 순차 파싱한다.
@@ -175,6 +263,7 @@ def _build_event(entry, message, index):
 def ingest_waf_audit_log(path=WAF_AUDIT_LOG_PATH):
     ingested = 0
     responded = 0
+    auto_blocked = 0
 
     for entry in _iter_json_entries(path) or []:
         for index, message in enumerate(_messages(entry)):
@@ -185,6 +274,22 @@ def ingest_waf_audit_log(path=WAF_AUDIT_LOG_PATH):
                 continue
 
             ingested += 1
+            auto_block = _maybe_auto_block_ip(event)
+            if auto_block:
+                auto_blocked += 1
+                response_event = dict(event)
+                response_event.update(
+                    {
+                        "source": "soar",
+                        "severity": "high",
+                        "action": "respond",
+                        "reason": auto_block["reason"],
+                        "event_id": f"soar:auto-block:{event['event_id']}",
+                    }
+                )
+                if log_security_event(**response_event):
+                    responded += 1
+
             if event["severity"] in {"high", "critical"} and event["event_type"] != "anomaly_summary":
                 response_event = dict(event)
                 response_event.update(
@@ -198,4 +303,9 @@ def ingest_waf_audit_log(path=WAF_AUDIT_LOG_PATH):
                 if log_security_event(**response_event):
                     responded += 1
 
-    return {"ingested": ingested, "responded": responded, "path": path}
+    return {
+        "ingested": ingested,
+        "responded": responded,
+        "auto_blocked": auto_blocked,
+        "path": path,
+    }

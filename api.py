@@ -8,7 +8,7 @@ import uuid
 import os
 import json
 import asyncio
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from sls_scanner.services.scanner_service import (
     run_scan_job,
@@ -30,99 +30,6 @@ MAX_CONCURRENT_SCANS = int(os.getenv("MAX_CONCURRENT_SCANS", "3"))
 _scan_semaphore: asyncio.Semaphore | None = None
 _pending_jobs:   list[str] = []
 _active_jobs:    list[str] = []
-
-# ── #12 봇 블랙리스트 ─────────────────────────────────────────────
-import time
-import collections
-import fnmatch
-from datetime import timedelta
-
-_ip_blacklist:  dict[str, dict] = {}   # ip → {reason, blocked_at, auto}
-_request_log:   collections.deque = collections.deque(maxlen=5000)  # 최근 요청 이력
-
-# 봇 탐지 규칙
-_BOT_PATHS = {
-    "/mcp", "/sse", "/mcp-sse", "/.env", "/.git/config",
-    "/config.json", "/AGENTS.md", "/metrics",
-    "/nmaplowercheck", "/Trinity.txt", "/HNAP1", "/evox/about",
-    "/.well-known/security.txt",
-}
-_BOT_METHODS   = {"CONNECT"}           # 프록시 악용
-_BOT_RATE_LIMIT = 80                   # 60초 내 N 요청 초과 시 차단
-_BOT_RATE_WINDOW = 60                  # 초
-_BOT_AUTO_THRESHOLD = 3                # 탐지 횟수 → 자동 차단
-_ip_strike: dict[str, int] = {}        # ip → 누적 탐지 횟수
-
-
-# ── 요청 방어 헬퍼 ────────────────────────────────────────────────
-# 앱 레벨 봇 가드에서 사용하는 메모리 기반 IP 차단/탐지 로직이다.
-
-# 요청 IP가 현재 블랙리스트에 있는지 확인한다.
-def _is_blacklisted(ip: str) -> tuple[bool, str]:
-    entry = _ip_blacklist.get(ip)
-    if not entry:
-        return False, ""
-    return True, entry.get("reason", "블랙리스트")
-
-# 특정 IP를 수동/자동 블랙리스트에 등록한다.
-def _add_blacklist(ip: str, reason: str, auto: bool = True):
-    _ip_blacklist[ip] = {
-        "reason":     reason,
-        "blocked_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "auto":       auto,
-    }
-    print(f"  [BLACKLIST] {ip} 차단 — {reason}")
-
-# 요청 경로/메서드/빈도를 분석해 봇성 요청이면 strike를 누적하고 임계치 초과 시 차단한다.
-def _analyze_request(ip: str, method: str, path: str):
-    """요청 패턴 분석 → 봇 탐지 시 strike 누적 → 임계값 초과 시 자동 차단"""
-    if ip in _ip_blacklist:
-        return
-
-    # 내부/사설 IP는 절대 블랙리스트 대상 아님 (Nmap, Docker 브리지 등)
-    import ipaddress as _ip_mod
-    try:
-        _addr = _ip_mod.ip_address(ip)
-        if _addr.is_private or _addr.is_loopback or _addr.is_link_local:
-            return
-    except ValueError:
-        pass
-
-    # 인증된 사용자 경로는 rate-limit 대상에서 제외
-    SAFE_PREFIXES = ("/api/scan", "/api/blacklist", "/dashboard",
-                     "/admin", "/auth", "/static", "/view", "/report")
-    if any(path.startswith(p) for p in SAFE_PREFIXES):
-        return
-
-    strike = False
-    reason = ""
-
-    # 민감 경로 탐색
-    for bot_path in _BOT_PATHS:
-        if path == bot_path or path.startswith(bot_path):
-            strike = True
-            reason = f"민감 경로 탐색: {path}"
-            break
-
-    # 프록시 악용
-    if not strike and method in _BOT_METHODS:
-        strike = True
-        reason = f"프록시 악용 시도: {method}"
-
-    # Rate-limit 체크 (안전 경로 제외 후)
-    if not strike:
-        now = time.time()
-        recent = [r for r in _request_log
-                  if r["ip"] == ip and now - r["ts"] < _BOT_RATE_WINDOW]
-        if len(recent) > _BOT_RATE_LIMIT:
-            strike = True
-            reason = f"과다 요청: {len(recent)}건/{_BOT_RATE_WINDOW}s"
-
-    if strike:
-        _ip_strike[ip] = _ip_strike.get(ip, 0) + 1
-        if _ip_strike[ip] >= _BOT_AUTO_THRESHOLD:
-            _add_blacklist(ip, reason, auto=True)
-            _ip_strike.pop(ip, None)
 
 from database import (
     init_db,
@@ -167,32 +74,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 API_KEY = os.getenv("API_KEY", "sls-secret-2026")
-
-
-@app.middleware("http")
-# 모든 HTTP 요청에 대해 블랙리스트 차단과 봇성 요청 분석을 수행한다.
-async def bot_blacklist_middleware(request: Request, call_next):
-    if os.getenv("APP_BOT_GUARD_ENABLED", "true").lower() in {"0", "false", "no", "off"}:
-        return await call_next(request)
-
-    import time as _time
-    ip  = request.client.host if request.client else "unknown"
-    path   = request.url.path
-    method = request.method
-
-    # 블랙리스트 차단
-    blocked, reason = _is_blacklisted(ip)
-    if blocked:
-        from fastapi.responses import JSONResponse
-        return JSONResponse(status_code=403, content={"detail": f"Forbidden: {reason}"})
-
-    # 요청 이력 기록
-    _request_log.append({"ip": ip, "method": method, "path": path, "ts": _time.time()})
-
-    # 봇 패턴 분석 (비동기로 분리해 응답 지연 없음)
-    asyncio.create_task(asyncio.to_thread(_analyze_request, ip, method, path))
-
-    return await call_next(request)
 
 
 @app.middleware("http")
@@ -1429,40 +1310,6 @@ async def api_scan_events(job_id: str, request: Request):
             "X-Accel-Buffering": "no",   # nginx 버퍼링 비활성화
         },
     )
-
-
-# 관리자에게 현재 블랙리스트, strike, 최근 요청 기록을 반환한다.
-@app.get("/api/blacklist")
-async def api_get_blacklist(request: Request):
-    u = _current_user(request)
-    if not u or u.get("role") != "admin":
-        raise HTTPException(status_code=403)
-    return {
-        "blacklist": [
-            {"ip": ip, **info} for ip, info in _ip_blacklist.items()
-        ],
-        "strikes": dict(_ip_strike),
-        "recent_requests": list(_request_log)[-50:],
-    }
-
-# 관리자가 특정 IP를 수동으로 블랙리스트에 추가한다.
-@app.post("/api/blacklist/{ip}")
-async def api_add_blacklist(ip: str, request: Request):
-    u = _current_user(request)
-    if not u or u.get("role") != "admin":
-        raise HTTPException(status_code=403)
-    _add_blacklist(ip, reason="관리자 수동 차단", auto=False)
-    return {"blocked": True, "ip": ip}
-
-# 관리자가 특정 IP의 블랙리스트와 strike 기록을 해제한다.
-@app.delete("/api/blacklist/{ip}")
-async def api_remove_blacklist(ip: str, request: Request):
-    u = _current_user(request)
-    if not u or u.get("role") != "admin":
-        raise HTTPException(status_code=403)
-    removed = _ip_blacklist.pop(ip, None)
-    _ip_strike.pop(ip, None)
-    return {"unblocked": True, "ip": ip, "was_blocked": removed is not None}
 
 
 # 보안 이벤트 목록을 JSON으로 반환하고 화면과 같은 필터 기준을 적용한다.

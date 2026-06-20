@@ -58,7 +58,6 @@ services:
       - WAF_RULE_ENGINE=${WAF_RULE_ENGINE:-DetectionOnly}
       - WAF_BLOCKLIST_RULE_PATH=/app/config/waf/ip-blocklist.conf
       - WAF_RELOAD_COMMAND=${WAF_RELOAD_COMMAND:-docker exec sls_waf nginx -s reload}
-      - APP_BOT_GUARD_ENABLED=${APP_BOT_GUARD_ENABLED:-false}
       - MAX_CONCURRENT_SCANS=3   # 동시 스캔 수 (ZAP 메모리 감안해 조정)
     volumes:
       # 스캔 결과, SQLite 데이터, WAF 로그, WAF 설정 파일을 컨테이너에 연결한다.
@@ -105,11 +104,13 @@ services:
       - MODSEC_AUDIT_LOG_FORMAT=JSON
       - MODSEC_AUDIT_LOG_TYPE=Serial
       - PROXY_TIMEOUT=300s
+    command: ["/bin/sh", "-c", "sh /docker-entrypoint.d/99-sls-nginx-hardening.sh && nginx -g 'daemon off;'"]
     volumes:
       # WAF audit log는 host에 남기고, SLS 커스텀 규칙 파일은 읽기 전용으로 주입한다.
       - ./logs/waf:/var/log/modsecurity
       - ./config/waf/ip-blocklist.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-901-SLS-IP-BLOCKLIST.conf:ro
       - ./config/waf/sls-custom-rules.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-902-SLS-CUSTOM-RULES.conf:ro
+      - ./config/waf/nginx-hardening.sh:/docker-entrypoint.d/99-sls-nginx-hardening.sh:ro
     networks:
       - sls_net
     depends_on:
