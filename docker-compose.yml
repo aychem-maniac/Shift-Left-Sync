@@ -109,6 +109,8 @@ services:
       - ./logs/waf:/var/log/modsecurity
       - ./config/waf/ip-blocklist.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-901-SLS-IP-BLOCKLIST.conf:ro
       - ./config/waf/sls-custom-rules.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-902-SLS-CUSTOM-RULES.conf:ro
+      # WAF 이미지의 기본 entrypoint는 유지하고, 403 기본 nginx 문구만 시작 시점에 교체한다.
+      - ./config/waf/nginx-hardening.sh:/docker-entrypoint.d/99-sls-nginx-hardening.sh:ro
     networks:
       - sls_net
     depends_on:
