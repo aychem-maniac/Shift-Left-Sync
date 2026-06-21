@@ -380,7 +380,6 @@ def export_html(target, vulns, port_info, path, timestamp):
         '  var m={"CONFIRMED":"p-confirmed","UNVERIFIED":"p-unverified","FALSE_POSITIVE":"p-false_positive"};'
         '  return m[p]||"r-unknown";'
         '}'
-        '// 스캔 결과 payload가 리포트 DOM 구조를 깨뜨리지 않도록 표시 문자열만 이스케이프한다.'
         'function h(s){'
         '  var d=document.createElement("div");'
         '  d.textContent = (s == null ? "" : String(s));'
