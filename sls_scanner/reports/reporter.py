@@ -1,5 +1,5 @@
 # sls_scanner/reports/reporter.py
-import csv, json, os, re
+import csv, html as html_lib, json, os, re
 from datetime import datetime
 from collections import Counter
 
@@ -174,23 +174,30 @@ def export_html(target, vulns, port_info, path, timestamp):
         "scoreColor": score_color,
     })
 
+    def _html(value):
+        return html_lib.escape("" if value is None else str(value), quote=True)
+
+    target_html = _html(target)
+    timestamp_html = _html(timestamp)
+
     # ── 포트 테이블 ───────────────────────────────────────────
     port_rows = ""
     for p in port_info:
         state = p.get("state","")
+        state_html = _html(state)
         state_badge = (
             '<span style="background:#5cb85c;color:white;padding:2px 8px;border-radius:10px;font-size:11px">open</span>'
             if state == "open" else
-            '<span style="background:#888;color:white;padding:2px 8px;border-radius:10px;font-size:11px">' + state + '</span>'
+            '<span style="background:#888;color:white;padding:2px 8px;border-radius:10px;font-size:11px">' + state_html + '</span>'
         )
         port_rows += (
             "<tr>"
-            "<td>" + str(p.get("host","")) + "</td>"
-            "<td><strong>" + str(p.get("port","")) + "</strong></td>"
-            "<td>" + str(p.get("protocol","")) + "</td>"
-            "<td>" + str(p.get("service","")) + "</td>"
+            "<td>" + _html(p.get("host","")) + "</td>"
+            "<td><strong>" + _html(p.get("port","")) + "</strong></td>"
+            "<td>" + _html(p.get("protocol","")) + "</td>"
+            "<td>" + _html(p.get("service","")) + "</td>"
             "<td>" + state_badge + "</td>"
-            "<td>" + str(p.get("product","")) + " " + str(p.get("version","")) + "</td>"
+            "<td>" + _html(p.get("product","")) + " " + _html(p.get("version","")) + "</td>"
             "</tr>"
         )
     if not port_rows:
@@ -221,31 +228,32 @@ def export_html(target, vulns, port_info, path, timestamp):
     # ── HTML 헤더 (f-string — JS 없음) ───────────────────────
     html_head = (
         '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">'
-        '<title>[전문가] SLS Report — ' + target + '</title>'
+        '<title>[전문가] SLS Report — ' + target_html + '</title>'
         '<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>'
         '<style>'
         '*{box-sizing:border-box;margin:0;padding:0}'
         'body{font-family:Arial,sans-serif;background:#1a1d27;color:#e0e0e0;font-size:13px}'
+        'html,body{max-width:100%;overflow-x:hidden}'
         '.header{background:linear-gradient(135deg,#1F4E79,#2d3561);padding:20px 32px;'
-        'display:flex;justify-content:space-between;align-items:center}'
+        'display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}'
         '.header h1{color:#90CAF9;font-size:20px;font-weight:bold}'
         '.header-meta{font-size:11px;color:#aaa;text-align:right;line-height:1.8}'
         '.header-meta a{color:#64b5f6}'
-        '.container{max-width:1200px;margin:0 auto;padding:20px}'
+        '.container{width:min(1200px,100%);margin:0 auto;padding:20px}'
         '.section{margin-bottom:28px}'
         '.section-title{font-size:15px;color:#64b5f6;font-weight:bold;margin-bottom:14px;'
         'padding-bottom:8px;border-bottom:1px solid #2d3561}'
-        '.card-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}'
+        '.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:20px}'
         '.card{background:#1a1f2e;border:1px solid #2d3561;border-radius:10px;'
         'padding:14px;text-align:center}'
         '.card-n{font-size:28px;font-weight:bold;margin-bottom:4px}'
         '.card-l{font-size:11px;color:#888}'
-        '.chart-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}'
+        '.chart-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:20px}'
         '.chart-box{background:#1a1f2e;border:1px solid #2d3561;border-radius:10px;padding:16px}'
         '.chart-box h3{font-size:12px;color:#888;margin-bottom:10px;text-align:center}'
         '.gauge-box{background:#1a1f2e;border:1px solid #2d3561;border-radius:10px;'
         'padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center}'
-        'table{width:100%;border-collapse:collapse;background:#1a1f2e;font-size:12px}'
+        'table{width:100%;min-width:920px;border-collapse:collapse;background:#1a1f2e;font-size:12px}'
         'th{background:#0f1117;color:#64b5f6;padding:8px 10px;text-align:left;'
         'border-bottom:2px solid #2d3561;position:sticky;top:0}'
         'td{padding:7px 10px;border-bottom:1px solid #111827;vertical-align:top}'
@@ -268,7 +276,7 @@ def export_html(target, vulns, port_info, path, timestamp):
         '.expand-btn{background:none;border:none;color:#64b5f6;cursor:pointer;font-size:11px}'
         '.detail-row{background:#0f1117}'
         '.detail-cell{padding:10px 14px;font-size:11px;color:#aaa;line-height:1.6}'
-        '.tbl-wrap{overflow-y:auto;border-radius:8px;border:1px solid #2d3561}'
+        '.tbl-wrap{overflow:auto;border-radius:8px;border:1px solid #2d3561}'
         '.port-wrap{max-height:220px}'
         '.vuln-wrap{height:520px;max-height:520px}'
         '.search-box{background:#0f1117;border:1px solid #2d3561;color:#e0e0e0;'
@@ -282,7 +290,7 @@ def export_html(target, vulns, port_info, path, timestamp):
         '<div class="header">'
         '<div><h1>🛡️ Shift-Left-Sync 보안 스캔 리포트</h1>'
         '<div style="font-size:12px;color:#aaa;margin-top:4px">'
-        '대상: ' + target + ' &nbsp;|&nbsp; 점검 일시: ' + timestamp +
+        '대상: ' + target_html + ' &nbsp;|&nbsp; 점검 일시: ' + timestamp_html +
         '</div></div>'
         '<div class="header-meta">'
         '<a href="' + simple_link + '">📄 비전문가용 간편 리포트 →</a><br>'
@@ -353,7 +361,6 @@ def export_html(target, vulns, port_info, path, timestamp):
         '<tbody id="vulnBody"></tbody>'
         '</table></div></div>'
         '</div>'  # container
-        '</body>'
     )
 
     # ── JavaScript (순수 문자열 — f-string 없음) ──────────────
@@ -372,6 +379,12 @@ def export_html(target, vulns, port_info, path, timestamp):
         'function pocClass(p){'
         '  var m={"CONFIRMED":"p-confirmed","UNVERIFIED":"p-unverified","FALSE_POSITIVE":"p-false_positive"};'
         '  return m[p]||"r-unknown";'
+        '}'
+        '// 스캔 결과 payload가 리포트 DOM 구조를 깨뜨리지 않도록 표시 문자열만 이스케이프한다.'
+        'function h(s){'
+        '  var d=document.createElement("div");'
+        '  d.textContent = (s == null ? "" : String(s));'
+        '  return d.innerHTML;'
         '}'
 
         'function renderTable(){'
@@ -393,23 +406,23 @@ def export_html(target, vulns, port_info, path, timestamp):
         '    var rid="row-"+i;'
         '    html += "<tr id=\'" + rid + "\'>"'
         '      + "<td><button class=\'expand-btn\' onclick=\'toggle(\\\""+ rid +"\\\")\'>▶</button></td>"'
-        '      + "<td>" + (v.tool||"") + "</td>"'
-        '      + "<td>" + (v.name||"") + "</td>"'
-        '      + "<td><span class=\'badge " + riskClass(v.risk) + "\'>" + (v.risk||"") + "</span></td>"'
-        '      + "<td><span class=\'badge " + pocClass(v.poc_status) + "\'>" + (v.poc_status||"") + "</span></td>"'
-        '      + "<td style=\'word-break:break-all;max-width:180px;font-size:11px\'>" + (v.url||"") + "</td>"'
-        '      + "<td>" + (v.cwe||"") + "</td>"'
-        '      + "<td style=\'font-size:11px\'>" + (v.owasp||"") + "</td>"'
+        '      + "<td>" + h(v.tool) + "</td>"'
+        '      + "<td>" + h(v.name) + "</td>"'
+        '      + "<td><span class=\'badge " + riskClass(v.risk) + "\'>" + h(v.risk) + "</span></td>"'
+        '      + "<td><span class=\'badge " + pocClass(v.poc_status) + "\'>" + h(v.poc_status) + "</span></td>"'
+        '      + "<td style=\'word-break:break-all;max-width:180px;font-size:11px\'>" + h(v.url) + "</td>"'
+        '      + "<td>" + h(v.cwe) + "</td>"'
+        '      + "<td style=\'font-size:11px\'>" + h(v.owasp) + "</td>"'
         '      + "</tr>";'
         '    html += "<tr id=\'" + rid + "-detail\' class=\'detail-row\' style=\'display:none\'>"'
         '      + "<td colspan=\'8\' class=\'detail-cell\'>"'
-        '      + "<strong>설명:</strong> " + (v.description||"-") + "<br>"'
-        '      + "<strong>PoC 검증 근거:</strong> " + (v.poc_reason||v.evidence||"-") + "<br>"'
-        '      + (v.cve_id ? "<strong>CVE:</strong> <a href=\\"https://nvd.nist.gov/vuln/detail/" + v.cve_id + "\\" target=\\"_blank\\">" + v.cve_id + "</a>&nbsp;&nbsp;" : "")'
-        '      + (v.cvss_score ? "<strong>CVSS:</strong> " + v.cvss_score + " (" + (v.cvss_severity||"") + ")&nbsp;&nbsp;" : "")'
-        '      + (v.cvss_vector ? "<span style=\\"font-size:11px;color:#666\\">" + v.cvss_vector + "</span><br>" : (v.cve_id ? "<br>" : ""))'
-        '      + (v.patch_url ? "<strong>패치/참고:</strong> <a href=\\"" + v.patch_url + "\\" target=\\"_blank\\">" + v.patch_url.substring(0,80) + "...</a><br>" : "")'
-        '      + "<strong>해결책:</strong> " + (v.solution||"-")'
+        '      + "<strong>설명:</strong> " + h(v.description||"-") + "<br>"'
+        '      + "<strong>PoC 검증 근거:</strong> " + h(v.poc_reason||v.evidence||"-") + "<br>"'
+        '      + (v.cve_id ? "<strong>CVE:</strong> <a href=\\"https://nvd.nist.gov/vuln/detail/" + encodeURIComponent(v.cve_id) + "\\" target=\\"_blank\\" rel=\\"noreferrer\\">" + h(v.cve_id) + "</a>&nbsp;&nbsp;" : "")'
+        '      + (v.cvss_score ? "<strong>CVSS:</strong> " + h(v.cvss_score) + " (" + h(v.cvss_severity||"") + ")&nbsp;&nbsp;" : "")'
+        '      + (v.cvss_vector ? "<span style=\\"font-size:11px;color:#666\\">" + h(v.cvss_vector) + "</span><br>" : (v.cve_id ? "<br>" : ""))'
+        '      + (v.patch_url ? "<strong>패치/참고:</strong> <a href=\\"" + h(v.patch_url) + "\\" target=\\"_blank\\" rel=\\"noreferrer\\">" + h(String(v.patch_url).substring(0,80)) + "...</a><br>" : "")'
+        '      + "<strong>해결책:</strong> " + h(v.solution||"-")'
         '      + "</td></tr>";'
         '  });'
         '  document.getElementById("vulnBody").innerHTML = html;'
@@ -477,7 +490,7 @@ def export_html(target, vulns, port_info, path, timestamp):
         '  options:cfg'
         '});'
 
-        '</script></html>'
+        '</script></body></html>'
     )
 
     html = html_head + html_banner + html_summary + html_charts + html_ports + html_vuln_wrap + js_block
