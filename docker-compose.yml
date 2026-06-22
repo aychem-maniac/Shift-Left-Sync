@@ -30,7 +30,7 @@ services:
   # 테스트 대상 애플리케이션.
   # 외부에 직접 포트를 열지 않고 WAF/scanner가 sls_net 내부에서 접근한다.
   juice-shop:
-    image: bkimminich/juice-shop
+    image: bkimminich/juice-shop:v20.0.0
     container_name: juice-shop
     expose:
       - "3000"

@@ -15,7 +15,11 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-RUN git clone --depth 1 https://github.com/sullo/nikto.git /opt/nikto \
+RUN git init /opt/nikto \
+    && cd /opt/nikto \
+    && git remote add origin https://github.com/sullo/nikto.git \
+    && git fetch --depth 1 origin 999670cb6a939b6c93840ce666941756e4c5dcf5 \
+    && git checkout FETCH_HEAD \
     && ln -s /opt/nikto/program/nikto.pl /usr/local/bin/nikto \
     && chmod +x /opt/nikto/program/nikto.pl
 

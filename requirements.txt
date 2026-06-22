@@ -4,14 +4,14 @@ uvicorn==0.30.0
 pydantic==2.7.0
 
 # 보안 스캐너
-python-nmap
-python-owasp-zap-v2.4
-requests
-python-dotenv
-urllib3
-sqlmap
+python-nmap==0.7.1
+python-owasp-zap-v2.4==0.1.0
+requests==2.34.2
+python-dotenv==1.2.2
+urllib3==2.7.0
+sqlmap==1.10.6
 
-httpx
-jinja2
-aiofiles
-python-multipart
+httpx==0.28.1
+jinja2==3.1.6
+aiofiles==25.1.0
+python-multipart==0.0.32
