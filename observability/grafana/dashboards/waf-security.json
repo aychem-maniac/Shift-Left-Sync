@@ -444,7 +444,7 @@
             "type": "loki",
             "uid": "Loki"
           },
-          "expr": "{job=\"waf\"} | json client_ip=\"transaction.client_ip\", method=\"transaction.request.method\", uri=\"transaction.request.uri\", status=\"transaction.response.http_code\", rule_id=\"transaction.messages[0].details.ruleId\", message=\"transaction.messages[0].message\" | line_format \"ip={{.client_ip}} method={{.method}} uri={{.uri}} status={{.status}} rule={{.rule_id}} msg={{.message}}\"",
+          "expr": "{job=\"waf\"} | json client_ip=\"transaction.client_ip\", method=\"transaction.request.method\", uri=\"transaction.request.uri\", status=\"transaction.response.http_code\", rule_id=\"transaction.messages[0].details.ruleId\", message=\"transaction.messages[0].message\", matched_data=\"transaction.messages[0].details.data\", match_detail=\"transaction.messages[0].details.match\" | line_format \"ip={{.client_ip}} method={{.method}} uri={{.uri}} status={{.status}} rule={{.rule_id}} matched={{.matched_data}} detail={{.match_detail}} msg={{.message}}\"",
           "refId": "A"
         }
       ],
