@@ -28,7 +28,7 @@ Shift-Left-Sync는 6가지 오픈소스 보안 스캐너(OWASP ZAP, Nmap, SQLMap
 
 - OWASP ZAP / Nmap / SQLMap / Nikto / Nuclei / Header Scanner 통합 스캔
 - 스캔 전 타겟 소유권 검증 (파일 업로드 / 메타태그 방식)
-- 취약점 결과를 OWASP Top 10 2021 카테고리로 자동 매핑
+- 취약점 결과를 OWASP Top 10 2025 카테고리로 자동 매핑
 - XSS canary 반사, SQLi 에러/시간 기반, CORS, 쿠키 속성 등 PoC 자동 검증
 - 결과를 `CONFIRMED / UNVERIFIED / FALSE_POSITIVE`로 분류
 - CSV, JSON, HTML 멀티 포맷 리포트 자동 생성
