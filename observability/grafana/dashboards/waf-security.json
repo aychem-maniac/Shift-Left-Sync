@@ -427,6 +427,7 @@
         "y": 16
       },
       "id": 6,
+      "description": "원본 WAF audit log는 보존하되 Grafana 화면에서는 response.body 전체 HTML 대신 핵심 필드만 요약해 표시합니다.",
       "options": {
         "dedupStrategy": "none",
         "enableLogDetails": true,
@@ -443,7 +444,7 @@
             "type": "loki",
             "uid": "Loki"
           },
-          "expr": "{job=\"waf\"}",
+          "expr": "{job=\"waf\"} | json client_ip=\"transaction.client_ip\", method=\"transaction.request.method\", uri=\"transaction.request.uri\", status=\"transaction.response.http_code\", rule_id=\"transaction.messages[0].details.ruleId\", message=\"transaction.messages[0].message\" | line_format \"ip={{.client_ip}} method={{.method}} uri={{.uri}} status={{.status}} rule={{.rule_id}} msg={{.message}}\"",
           "refId": "A"
         }
       ],
